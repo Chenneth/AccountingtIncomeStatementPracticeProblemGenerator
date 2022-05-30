@@ -29,8 +29,7 @@ namespace AcctISGenerator
             public bool visiting, //this value is used mainly when setting needsSolving
                 needsSolving, //as in, this value was not given in the initial problem
                 solvingSet;     //this value is used when setting needsSolving
-
-
+            
             public List<AccountVal[]> substitutes;
             public string Name { get; set; }
 
@@ -40,6 +39,7 @@ namespace AcctISGenerator
                 substitutes = new List<AccountVal[]>(3);
                 amount = 0;
                 solvingSet =  needsSolving = false;
+                _isSolvableVisiting = visiting = false;
             }
             public AccountVal(int amount)
             {
@@ -47,7 +47,7 @@ namespace AcctISGenerator
                 substitutes = new List<AccountVal[]>(3);//did 3 because i am lazy
                 this.amount = amount;
                 solvingSet = needsSolving = false; //defaulting
-                
+                _isSolvableVisiting = visiting = false;
             }
             public AccountVal(int amount, bool needsSolving)
             {
@@ -55,151 +55,72 @@ namespace AcctISGenerator
                 substitutes = new List<AccountVal[]>(3);
                 this.amount = amount;
                 solvingSet = this.needsSolving = needsSolving;
+                _isSolvableVisiting = visiting = false;
             }
 
-            public static AccountVal operator +(AccountVal a, AccountVal b)
-            {
-                return new AccountVal(a.amount+b.amount);
-            }
-            public static AccountVal operator -(AccountVal a, AccountVal b)
-            {
-                return new AccountVal(a.amount-b.amount);
-            }
-            public static AccountVal operator /(AccountVal a, AccountVal b)
-            {
-                return new AccountVal(a.amount/b.amount);
-            }
-            public static AccountVal operator *(AccountVal a, AccountVal b)
-            {
-                return new AccountVal(a.amount*b.amount);
-            }
-            public static AccountVal operator %(AccountVal a, AccountVal b)
-            {
-                return new AccountVal(a.amount%b.amount);
-            }
-            public static AccountVal operator +(AccountVal a, int b)
-            {
-                return new AccountVal(a.amount+b);
-            }
-            public static AccountVal operator -(AccountVal a, int b)
-            {
-                return new AccountVal(a.amount-b);
-            }
-            public static AccountVal operator /(AccountVal a, int b)
-            {
-                return new AccountVal(a.amount/b);
-            }
-            public static AccountVal operator *(AccountVal a, int b)
-            {
-                return new AccountVal(a.amount*b);
-            }
-            public static AccountVal operator %(AccountVal a, int b)
-            {
-                return new AccountVal(a.amount%b);
-            }
-            public static AccountVal operator +(int b,AccountVal a)
-            {
-                return new AccountVal(a.amount+b);
-            }
-            public static AccountVal operator -(int b,AccountVal a)
-            {
-                return new AccountVal(b-a.amount);
-            }
-            public static AccountVal operator /(int b,AccountVal a)
-            {
-                return new AccountVal(b/a.amount);
-            }
-            public static AccountVal operator *(int b,AccountVal a)
-            {
-                return new AccountVal(a.amount*b);
-            }
-            public static AccountVal operator %(int b,AccountVal a)
-            {
-                return new AccountVal(b%a.amount);
-            }
-            //we are not overloading the bitshift operators (there is literally no need for something simple like this)
-
-
-            public static bool operator ==(AccountVal a, AccountVal b)
-            {
-                return a.amount == b.amount;
-            }
-
-            public static bool operator !=(AccountVal a, AccountVal b)
-            {
-                return a.amount != b.amount;
-            }
-
-            public static bool operator ==(AccountVal a, int b)
-            {
-                return a.amount == b;
-            }
-             public static bool operator !=(AccountVal a, int b)
-             {
-                return a.amount != b;
-             }
-            public static bool operator !=(int b,AccountVal a)
-            {
-                return a.amount != b;
-            }
-            public static bool operator ==(int b, AccountVal a)
-            {
-                return a.amount == b;
-            }
-
-            public static bool operator >=(AccountVal a, AccountVal b)
-            {
-                return a.amount >= b.amount;
-            }
-            public static bool operator <=(AccountVal a, AccountVal b)
-            {
-                return a.amount <= b.amount;
-            }
-            public static bool operator >=(AccountVal a, int b)
-            {
-                return a.amount >= b;
-            }
-            public static bool operator <=(AccountVal a, int b)
-            {
-                return a.amount <= b;
-            }
-            public static bool operator >=(int b,AccountVal a)
-            {
-                return a.amount >= b;
-            }
-            public static bool operator <=(int b,AccountVal a)//look at me, i just moved the parameter to the end so fancy
-            {
-                return a.amount <= b;
-            }
-          
-            public static bool operator >(AccountVal a, AccountVal b)
-            {
-                return a.amount > b.amount;
-            }
-
-            public static bool operator <(AccountVal a, AccountVal b)
-            {
-                return a.amount < b.amount;
-            }
-            public static bool operator >(AccountVal a, int b)
-            {
-                return a.amount > b;
-            }
-
-            public static bool operator <(AccountVal a, int b)
-            {
-                return a.amount < b;
-            }
-            public static bool operator >( int b, AccountVal a)
-            {
-                return b>a.amount;
-            }
-
-            public static bool operator <( int b, AccountVal a)
-            {
-                return b < a.amount;
-            }
+            private bool _isSolvableVisiting;
             
+            public bool IsSolvable()
+            {
+                _isSolvableVisiting = true;
+                if (needsSolving)
+                {
+                    _isSolvableVisiting = false;
+                    return true;
+                }
+                //iterate through substitutes
+
+                //mmm it went past the forbidden line in my ide so i split it up a bit
+                if ((from substituteGroup in substitutes 
+                        where !substituteGroup.Any(x=>x._isSolvableVisiting) 
+                        select substituteGroup.All(
+                            t => t is not null && t.IsSolvable())).Any(groupSolvable => groupSolvable))
+                {
+                    _isSolvableVisiting = false;
+                    return true;
+                }
+
+                _isSolvableVisiting = false;
+                return false;
+            }
+
+            //the stupid operator overloads. this takes up too much space
+            //we are not overloading the bitshift operators (there is literally no need for something like this)
+            //it was taking up too much space and was a pain to scroll through so i removed some of the line breaks
+                    //this was 90+ lines before...
+            public static AccountVal operator +(AccountVal a, AccountVal b) { return new AccountVal(a.amount+b.amount); }
+            public static AccountVal operator -(AccountVal a, AccountVal b) { return new AccountVal(a.amount-b.amount); }
+            public static AccountVal operator /(AccountVal a, AccountVal b) { return new AccountVal(a.amount/b.amount); }
+            public static AccountVal operator *(AccountVal a, AccountVal b) { return new AccountVal(a.amount*b.amount); }
+            public static AccountVal operator %(AccountVal a, AccountVal b) { return new AccountVal(a.amount%b.amount); }
+            public static AccountVal operator +(AccountVal a, int b) { return new AccountVal(a.amount+b); }
+            public static AccountVal operator -(AccountVal a, int b) { return new AccountVal(a.amount-b); }
+            public static AccountVal operator /(AccountVal a, int b) { return new AccountVal(a.amount/b); }
+            public static AccountVal operator *(AccountVal a, int b) { return new AccountVal(a.amount*b); }
+            public static AccountVal operator %(AccountVal a, int b) { return new AccountVal(a.amount%b); }
+            public static AccountVal operator +(int b,AccountVal a) { return new AccountVal(a.amount+b); }
+            public static AccountVal operator -(int b,AccountVal a) { return new AccountVal(b-a.amount); }
+            public static AccountVal operator /(int b,AccountVal a) { return new AccountVal(b/a.amount); }
+            public static AccountVal operator *(int b,AccountVal a) { return new AccountVal(a.amount*b); }
+            public static AccountVal operator %(int b,AccountVal a) { return new AccountVal(b%a.amount); }
+            public static bool operator ==(AccountVal a, AccountVal b) { return a.amount == b.amount; }
+            public static bool operator !=(AccountVal a, AccountVal b) { return a.amount != b.amount; }
+            public static bool operator ==(AccountVal a, int b) { return a.amount == b; }
+            public static bool operator !=(AccountVal a, int b) { return a.amount != b; }
+            public static bool operator !=(int b,AccountVal a) { return a.amount != b; }
+            public static bool operator ==(int b, AccountVal a) { return a.amount == b; }
+            public static bool operator >=(AccountVal a, AccountVal b) { return a.amount >= b.amount; }
+            public static bool operator <=(AccountVal a, AccountVal b) { return a.amount <= b.amount; }
+            public static bool operator >=(AccountVal a, int b) { return a.amount >= b; }
+            public static bool operator <=(AccountVal a, int b) { return a.amount <= b; }
+            public static bool operator >=(int b,AccountVal a) { return a.amount >= b; }
+            public static bool operator <=(int b,AccountVal a) { return a.amount <= b; }
+            public static bool operator >(AccountVal a, AccountVal b) { return a.amount > b.amount; }
+            public static bool operator <(AccountVal a, AccountVal b) { return a.amount < b.amount; }
+            public static bool operator >(AccountVal a, int b) { return a.amount > b; }
+            public static bool operator <(AccountVal a, int b) { return a.amount < b; }
+            public static bool operator >( int b, AccountVal a) { return b>a.amount; }
+            public static bool operator <( int b, AccountVal a) { return b < a.amount; }
         }
         
         //example account values (taken from 2018-District test of UIL Accounting
@@ -238,33 +159,29 @@ namespace AcctISGenerator
             Then the program should solve for the remaining accounts*/
             
             //initializing values
-            RNGCryptoServiceProvider rg = new RNGCryptoServiceProvider();
-            byte[] bytes = new byte[4];     //4 bytes is 32 bits... GetBytes throws an exception if the array is less than 4 bytes
-            rg.GetBytes(bytes,0,2/*2 bytes is worth 65536 in base 10*/);
-            //divide the byte to bit value by 10 because we don't need that (65k is a lot for returns and discounts btw)
-            /*We set these in this order (instead of alphabetical or whatnot) so we don't have to reset any array indices after using the random value*/
-            _transportationIn = new AccountVal(500+BitConverter.ToInt32(bytes, 0)/10, false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            _purchasesRetAndAllow = new AccountVal(300+BitConverter.ToInt32(bytes,0)/10,false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            _purchasesDiscounts = new AccountVal(300+BitConverter.ToInt32(bytes,0)/10,false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            _salesRetAndAllow = new AccountVal(300+BitConverter.ToInt32(bytes,0)/10,false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            _salesDiscounts = new AccountVal(300+BitConverter.ToInt32(bytes,0)/10,false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            //beginning inventory will be a range of 10k to 75536k
-            _beginningInventory = new AccountVal(10000+BitConverter.ToInt32(bytes,0),false/*todo*/);
-            rg.GetBytes(bytes,0,2);
-            _endingInventory = new AccountVal(10000+BitConverter.ToInt32(bytes,0),false/*todo*/);
 
-                //i am not worried about these numbers being *too* realistic... who cares if their COMS may exceed their sales by a ton?
+            //endpoints are arbitrary... don't think too much about them
+            //trying to make this seem like a medium-sized business (aka not Walmart)
+            _transportationIn = new AccountVal(500+RandomNumberGenerator.GetInt32(500,10000), false);
+
+            _purchasesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,8700),false);
+
+            _purchasesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,16500),false);
+
+            _salesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,14750),false);
+
+            _salesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,13440),false);   //haha our company does not provide the discount
+                                                                                                                        //jonathan you are causing me to lose potential business
+
+            //it is bad practice to have a lot of inventory on hand (somethingsomething kaizen... love the fact that they have to use japanese just to say the word improvement)
+                //>>proceeds to give the business a chance for high returns/allowances 
+            _beginningInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
             
-            rg.GetBytes(bytes,0,3);
-            //since 3 bytes gives us a max of 16mil in base10... we divide by 100 so we can't have a value or 160k
-            _purchases = new AccountVal(80000+BitConverter.ToInt32(bytes,0)/100,false/*todo*/);
-            rg.GetBytes(bytes,0,3);
-            _sales = new AccountVal(80000+BitConverter.ToInt32(bytes,0)/100,false);//obligatory todo: set the 'needsSolving' var properly
+            _endingInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
+            
+            _purchases = new AccountVal(RandomNumberGenerator.GetInt32(80000,300000),false/*todo*/);
+           
+            _sales = new AccountVal(RandomNumberGenerator.GetInt32(_purchases.amount*3/4,375000),false);
 
             _costOfDeliveredMerchandise = _purchases + _transportationIn;
             _netPurchases = _costOfDeliveredMerchandise - _purchasesRetAndAllow - _purchasesDiscounts;
@@ -274,7 +191,8 @@ namespace AcctISGenerator
             _grossProfit = _netSales - _costOfMerchandiseSold;
             
             //setting up substitutes
-            //by this point if you haven't realized, this stuff is incredibly inefficient (but it works)... blame UNTs slow-paced CS program
+            //by this point if you haven't realized, this stuff is incredibly inefficient (but it works)... i blame UNTs slow-paced CS program
+                                                                                                //also it's been a year or so since i programmed seriously (and in .net)
             _purchases.substitutes.Add(new AccountVal[]{_transportationIn,_costOfDeliveredMerchandise});
             
             _transportationIn.substitutes.Add(new AccountVal[]{_purchases,_costOfDeliveredMerchandise});
@@ -308,7 +226,7 @@ namespace AcctISGenerator
             
             _grossProfit.substitutes.Add(new []{_netSales,_costOfMerchandiseSold});
             
-            //here are the equations:
+            //here are the equations for those of you who have never taken accounting before (it's fun please take it):
             
             /*Purchases + Transportation In = Cost of Delivered Merchandise
                 Cost of Delivered Merchandise - P_Returns - P_Discounts = Net Purchases
@@ -319,7 +237,8 @@ namespace AcctISGenerator
                 Sales - S_Returns - S_Discounts = Net Sales
 
                 Net Sales - Cost of Merchandise Sold = Gross Profit*/
-            //alphabet soup for those who prefer it:
+            
+            //alphabet soup for those who prefer it over fun accounting concepts:
             /*  A + B = C
                 C - D - E = F
 
@@ -372,63 +291,34 @@ namespace AcctISGenerator
                 _purchasesDiscounts, _purchasesRetAndAllow, _sales, _salesDiscounts, _salesRetAndAllow,
                 _transportationIn
             };
-            bytes[0] = bytes[1] = bytes[2] = bytes[3] = 0;
-            
-            
-            for (int i = 0; i < accounts.Length; i++) //suggestion: visit these randomly as opposed to this because this makes latter variables less likely to be setor something
+            AccountVal[] tempArr = (AccountVal[])accounts.Clone();
+            //i am not putting a nullcheck since that doesn't make sense
+
+
+            while (tempArr.Length>0)
             {
-                if (!accounts[i].solvingSet) //this will work for i=0... 
+                int rand = RandomNumberGenerator.GetInt32(0, tempArr.Length);
+                if (!tempArr[rand].solvingSet) //this will result in true for the first iteration 
                 {
                     //pass these objects by reference to decrease effect on stack
-                    setSolveStates(ref accounts[i],ref rg,ref bytes);
+                    setSolveStates(ref tempArr[rand]);
                 }
             }
-
-
-
         }
 
-        /*
-        private bool isSolvable(ref AccountVal original, ref AccountVal currentViewing)
-        {
-            if (!original.needsSolving)
-            {
-                return true;
-            }
-
-            
-        }
-
-        private bool recursiveSolveCheck(ref AccountVal original, ref AccountVal currentViewing)
-        {
-            if (!currentViewing.needsSolving)
-            {
-                return true;
-            }
-            foreach (AccountVal[] substituteArr in original.substitutes)
-            {
-                if (substituteArr.Contains(original)) //if substitutes only contains the original, then
-                {
-                    continue;
-                }
-
-                foreach (AccountVal account in substituteArr)
-                {
-                      
-                }
-            }
-
-            return false;
-        }*/
-        
-        
         //returns true if the account needs to be solved for, false if it does not
-        private bool setSolveStates(ref AccountVal a, ref RNGCryptoServiceProvider rg, ref byte[] bytes)
+        private bool setSolveStates(ref AccountVal a)
         {
             a.visiting = true;
             
-            rg.GetBytes(bytes,0,1);
-            if (bytes[0] % 2 == 0) //if the value is even (so 50/50 chance of either option)
+            //randomize this because... idk
+            /* Honestly this could probably be removed... i had this before the
+             *
+             *      int rand = RandomNumberGenerator.GetInt32(0, tempArr.Length);
+             *      if (!tempArr[rand].solvingSet)
+             *      was there. Whatever, it works as is; no point in fixing it when this isn't even an official job/
+             */
+            if (RandomNumberGenerator.GetInt32(1,4)==2) //1/3 chance to set the account value as given
             {
                 //this value does not need to be solved for and will be given in the problem
                 a.needsSolving = false;
@@ -447,42 +337,12 @@ namespace AcctISGenerator
                 for (var j = 0; j < substituteArr.Length; j++)
                 {
                     AccountVal account = substituteArr[j];
-                    //if the value needs to be solved for (this will check recursively ofcourse)
-                    if (!setSolveStates(ref account, ref rg, ref bytes))
+                    //if the value needs to be solved for (this will check recursively, ofcourse)
+                    if (!setSolveStates(ref account))
                     {
                         hasSolution = false;
                         break;
                     }
-                    
-                        
-                        
-                    //we check to see if the item has only one possible substitute
-                    /*if (account.substitutes.Count == 1)
-                        {
-                            bool allSet = true;
-                            foreach (AccountVal substitute in account.substitutes[0])
-                            {
-                                if (substitute.solvingSet)
-                                {
-                                    //if the value is needed to solve
-                                    if(substitute.needsSolving)
-                                    {
-                                        allSet = false;
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        continue;
-                                    }
-                                }
-                            }
-
-                            if (allSet)
-                            {
-                                
-                            }
-                            
-                        }*/
                 }
                 //if this substitue group could not be used to solve for this
                 if (!hasSolution) continue;
@@ -492,7 +352,7 @@ namespace AcctISGenerator
                 return false;
             }
             
-            //reaching this point means the program could not find a suitable substitute with the given parameters
+            //reaching this point means the program could not find a suitable substitute with the given substitutes
             a.needsSolving = false;
             a.solvingSet = true;
             a.visiting = false;
