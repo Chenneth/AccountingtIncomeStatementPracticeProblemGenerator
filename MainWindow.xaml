@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Accounting Income Statement Generator" MinHeight="250" Height="800" MinWidth="600" Width="800">
     <Grid Name="MainGrid">
-        <Grid x:Name="StartGrid" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center" ShowGridLines="True" Visibility="Hidden">
+        <Grid x:Name="StartGrid" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center" ShowGridLines="True" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -23,522 +23,530 @@
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition> 
                 </Grid.ColumnDefinitions>
-                <Button Name="Start" HorizontalAlignment="Center" VerticalAlignment="top" Margin="5,5,20,5" Grid.Column="0" MinHeight="40" MinWidth="70">Start</Button>
-                <Button Name="Help" HorizontalAlignment="center" VerticalAlignment="top" Margin="20,5,5,5" Grid.Column="1" MinHeight="40" MinWidth="70">Help</Button>
+                <Button Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="top" Margin="5,5,20,5" Grid.Column="0" MinHeight="40" MinWidth="70">Start</Button>
+                <Button Name="HelpButton" HorizontalAlignment="center" VerticalAlignment="top" Margin="20,5,5,5" Grid.Column="1" MinHeight="40" MinWidth="70">Help</Button>
             </Grid>
         </Grid>
-        <Grid x:Name="FunctionGrid" Margin="20" MinHeight="700">
+        <Grid x:Name="FunctionGrid" Margin="20" MinHeight="700" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" BorderThickness="2" BorderBrush="Black">
-                <Grid Name="IncomeStatementGrid" Margin="5" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="8*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Border Grid.Row="0" BorderThickness="1" BorderBrush="Black">
-                        <Grid x:Name="IncomeStatementHeaderGrid">
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBox x:Name="CompanyNameTextBox" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" BorderThickness="0" FontWeight="Bold" FontSize="13">Big Company and Stuffz Inc.</TextBox>
-                            <Border Grid.Row="1" BorderThickness="0,1,0,1" BorderBrush="Black">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" FontWeight="Bold" FontSize="13">Income Statement</TextBox>
-                            </Border>
-                            <TextBox BorderThickness="0" x:Name="DateTextBox" Grid.Row="2" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" FontWeight="Bold" FontSize="13">For year ended December 2018</TextBox>
-                        </Grid>
-                    </Border>
-                    <Border Grid.Row="1" BorderThickness="1,0,1,1" BorderBrush="Black">
-                        <Grid x:Name="IncomeStatementMainContentGrid">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60*"></ColumnDefinition>
-                                <ColumnDefinition Width="13*"></ColumnDefinition>
-                                <ColumnDefinition Width="13*"></ColumnDefinition>
-                                <ColumnDefinition Width="13*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition> 
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    Revenue:
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
-                            </Border>
-  
-                            <Border Grid.Column="0" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Sales
-                                </TextBox>
-                            </Border> 
-                            <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="0" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Less: Sales Discounts
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;Sales Returns and Allowances
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Net Sales
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    Cost of Goods Sold:
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Beginning Inventory
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Purchases
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Freight In
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Less: Purchases Discounts
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;Purchases Returns and Allowances
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Net Purchases
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Cost of Merchandise Available for Sale
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Less: Ending Inventory
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    &#x009;Cost of Goods Sold
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    Gross Profit
-                                </TextBox> 
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            
-                            <Border Grid.Column="0" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-
-                            <Border Grid.Column="0" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-
-                            <Border Grid.Column="0" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
-                            </Border>
-                            <Border Grid.Column="1" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="2" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                            <Border Grid.Column="3" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,0,0">
-                                <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
-                                    
-                                </TextBox>
-                            </Border>
-                        </Grid>
-                    </Border>
+            <Border x:Name="AccountListBorder" Grid.Column="0" BorderThickness="2" BorderBrush="Black" Margin="5" Visibility="Hidden">
+                <Grid x:Name="AccountListGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    
                 </Grid>
             </Border>
+            <Grid Grid.Column="0" x:Name="IncomeStatementGrid" Margin="5" Visibility="Hidden" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="8*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" BorderThickness="2,2,2,1" BorderBrush="Black">
+                    <Grid x:Name="IncomeStatementHeaderGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="CompanyNameTextBox" Grid.Row="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" BorderThickness="0" FontWeight="Bold" FontSize="13">Big Company and Stuffz Inc.</TextBox>
+                        <Border Grid.Row="1" BorderThickness="0,1,0,1" BorderBrush="Black">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" FontWeight="Bold" FontSize="13">Income Statement</TextBox>
+                        </Border>
+                        <TextBox BorderThickness="0" x:Name="DateTextBox" Grid.Row="2" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Bottom" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" FontWeight="Bold" FontSize="13">For year ended December 2018</TextBox>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="1" BorderThickness="2,0,2,2" BorderBrush="Black">
+                    <Grid x:Name="IncomeStatementMainContentGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60*"></ColumnDefinition>
+                            <ColumnDefinition Width="13*"></ColumnDefinition>
+                            <ColumnDefinition Width="13*"></ColumnDefinition>
+                            <ColumnDefinition Width="13*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition> 
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                Revenue:
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,0">
+                        </Border>
+  
+                        <Border Grid.Column="0" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Sales
+                            </TextBox>
+                        </Border> 
+                        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="1" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="0" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Less: Sales Discounts
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="2" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;Sales Returns and Allowances
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="3" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Net Sales
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="4" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                Cost of Goods Sold:
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="5" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Beginning Inventory
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="6" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Purchases
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="7" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Freight In
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="8" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Less: Purchases Discounts
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="9" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;&#x0020;Purchases Returns and Allowances
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="10" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Net Purchases
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="11" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Cost of Merchandise Available for Sale
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="12" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Less: Ending Inventory
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="13" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                &#x009;Cost of Goods Sold
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="14" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                Gross Profit
+                            </TextBox> 
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="15" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                            
+                        <Border Grid.Column="0" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="16" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="17" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="18" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="19" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="20" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+
+                        <Border Grid.Column="0" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="21" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+
+                        <Border Grid.Column="0" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
+                        </Border>
+                        <Border Grid.Column="1" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="2" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,1,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                        <Border Grid.Column="3" Grid.Row="22" BorderBrush="Black" BorderThickness="0,1,0,0">
+                            <TextBox BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextAlignment="Left" IsReadOnly="True">
+                                    
+                            </TextBox>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
         </Grid>
     </Grid>
 </Window>
