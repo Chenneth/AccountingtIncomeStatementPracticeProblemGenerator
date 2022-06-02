@@ -139,10 +139,15 @@ namespace AcctISGenerator
         */
         //Purchases+Transportation in (or Freight in, pick whichever)
         private AccountVal _beginningInventory, _costOfDeliveredMerchandise,_costOfMerchandiseSold,
-            _costOfMerchandiseAvaForSale, _endingInventory, _grossProfit,_netPurchases,_netSales,_purchases,
-            _purchasesDiscounts,_purchasesRetAndAllow,_sales,_salesDiscounts,_salesRetAndAllow,_transportationIn;
+            _costOfMerchandiseAvaForSale, _endingInventory, _grossProfit,
+            _netPurchases,_netSales,_purchases,
+            _purchasesDiscounts,_purchasesRetAndAllow,_sales,
+            _salesDiscounts,_salesRetAndAllow,_transportationIn;
+        //15 "accounts" (i am aware that cost of delivered merchandise and coms are not accounts) total
 
-        private AccountVal[] accounts;
+        private AccountVal[] _accounts;
+        private AccountVal[] _givenAccounts;
+        private int _givenAccountsSize;
         private void InitializeAccounts()
         {
             /*Randomize:
@@ -284,40 +289,42 @@ namespace AcctISGenerator
             _salesRetAndAllow.Name = "Sales Returns and Allowances";
             _transportationIn.Name = "Transportation In";
             //Do this so we can select a value to initialize
-            accounts = new[]
+            _accounts = new[]
             {
                 _beginningInventory, _costOfDeliveredMerchandise, _costOfMerchandiseSold,
                 _costOfMerchandiseAvaForSale, _endingInventory, _grossProfit, _netPurchases, _netSales, _purchases,
                 _purchasesDiscounts, _purchasesRetAndAllow, _sales, _salesDiscounts, _salesRetAndAllow,
                 _transportationIn
             };
-            AccountVal[] tempArr = (AccountVal[])accounts.Clone();
+            List<AccountVal> tempArr = _accounts.ToList();
             //i am not putting a nullcheck since that doesn't make sense
 
-
-            while (tempArr.Length>0)
+            
+            int tempRandIndex = RandomNumberGenerator.GetInt32(0, tempArr.Count);
+            AccountVal tempRand = tempArr[tempRandIndex];
+            tempRand.needsSolving = true;
+            tempRand.solvingSet = true;
+            tempArr.RemoveAt(tempRandIndex);
+            
+            while (tempArr.Count>0)
             {
-                int rand = RandomNumberGenerator.GetInt32(0, tempArr.Length);
+                int rand = RandomNumberGenerator.GetInt32(0, tempArr.Count);
                 if (!tempArr[rand].solvingSet) //this will result in true for the first iteration 
                 {
                     //pass these objects by reference to decrease effect on stack
-                    setSolveStates(ref tempArr[rand]);
+                    setSolveStates(tempArr[rand]);
+                    
                 }
+                tempArr.RemoveAt(rand);
             }
         }
 
         //returns true if the account needs to be solved for, false if it does not
-        private bool setSolveStates(ref AccountVal a)
+        private bool setSolveStates(AccountVal a)
         {
             a.visiting = true;
             
-            //randomize this because... idk
-            /* Honestly this could probably be removed... i had this before the
-             *
-             *      int rand = RandomNumberGenerator.GetInt32(0, tempArr.Length);
-             *      if (!tempArr[rand].solvingSet)
-             *      was there. Whatever, it works as is; no point in fixing it when this isn't even an official job/
-             */
+            //randomize this because otherwise it results in the same accounts being set to needs solving
             if (RandomNumberGenerator.GetInt32(1,4)==2) //1/3 chance to set the account value as given
             {
                 //this value does not need to be solved for and will be given in the problem
@@ -338,13 +345,13 @@ namespace AcctISGenerator
                 {
                     AccountVal account = substituteArr[j];
                     //if the value needs to be solved for (this will check recursively, ofcourse)
-                    if (!setSolveStates(ref account))
+                    if (!setSolveStates(account))
                     {
                         hasSolution = false;
                         break;
                     }
                 }
-                //if this substitue group could not be used to solve for this
+                //if this substitute group could not be used to solve for this
                 if (!hasSolution) continue;
                 a.needsSolving = true;
                 a.solvingSet = true;
@@ -361,8 +368,78 @@ namespace AcctISGenerator
         
         public MainWindow()
         {
-            Console.Out.WriteLine("testetstet");
+            //i don't know the max unsolved accounts we can have, but I know you need at least 3 accounts to solve most things
+            _givenAccounts = new AccountVal[12]; //i do not think it needs 13, but if it throws an IndexOutOfBounds error then it does
             InitializeComponent();
+            StartButton.Click += delegate(object sender, RoutedEventArgs args) {this.StartProgram();};
+        }
+
+        private void StartProgram()
+        {
+            StartGrid.Visibility = Visibility.Hidden;  
+            InitializeAccounts(); 
+            Array.Clear(_givenAccounts);
+            AccountListGrid.RowDefinitions.Clear();
+            _givenAccountsSize = 0; 
+         
+            //adds all the information to the grid that holds the account information
+            //_accounts is already alphabetically sorted so we shouldn't need to care about resorting this in the grid
+            foreach (AccountVal givenAccount in _accounts.Where(acct => !acct.needsSolving))
+            {
+                _givenAccounts[_givenAccountsSize] = givenAccount;
+                AccountListGrid.RowDefinitions.Add(new RowDefinition());
+                TextBox acctNameTextBox = new TextBox
+                {
+                    Text = givenAccount.Name,
+                    
+                    Margin = new Thickness(1,0,0,1),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    TextAlignment = TextAlignment.Left,
+                    BorderThickness = new Thickness(0),
+                    IsReadOnly = true
+                };
+                Console.Out.WriteLine(acctNameTextBox.Text);
+                Border boarder = new Border()
+                {
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(0,0,1,1)
+                };
+                boarder.Child = acctNameTextBox;
+                AccountListGrid.Children.Add(boarder);
+                Grid.SetRow(boarder,_givenAccountsSize);
+                Grid.SetColumn(boarder,0);
+                TextBox acctValTextBox = new TextBox()
+                {
+                    Text = givenAccount.amount.ToString("N"),
+                    
+                    Margin = new Thickness(0,0,1,1),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    TextAlignment = TextAlignment.Right,
+                    BorderThickness = new Thickness(0),
+                    IsReadOnly = true
+                };
+                Border acctValBorder = new Border()
+                {
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(0,0,0,1)
+                };
+                acctValBorder.Child = acctValTextBox;
+                AccountListGrid.Children.Add(acctValBorder);
+                Grid.SetRow(acctValBorder,_givenAccountsSize);
+                Grid.SetColumn(acctValBorder,1);
+                _givenAccountsSize++;
+            }
+
+            foreach (UIElement gridChild in AccountListGrid.Children)
+            {
+                if (gridChild is Border gridChildBorder && Grid.GetRow(gridChild) == AccountListGrid.RowDefinitions.Count - 1)
+                {
+                    gridChildBorder.BorderThickness = new Thickness(0, 0, gridChildBorder.BorderThickness.Right, 0);
+                }
+            }
+            FunctionGrid.Visibility = AccountListGrid.Visibility = AccountListBorder.Visibility = Visibility.Visible;
         }
     }
 }
