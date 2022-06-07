@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -570,16 +571,24 @@ namespace AcctISGenerator
 
         //used to verify answer as a valid input and so the program doesn't constantly create a new cultureinfo (don't want to use CurrentCulture either because idk)
         private static CultureInfo _cultureInfo = new CultureInfo("en-US");
-         
+        
+        //todo: convert this to a dictionary of <Textbox,CancellationTokenSource> so we can cancel the animation specific to that question...
+        private List<CancellationTokenSource> _cancellationTokens = new List<CancellationTokenSource>(10);//maybe needs more? could be defined in the constructor
+        
         private async void SubmitButtonPressed(object sender, RoutedEventArgs e)
         {
+            for (var i = 0; i < _cancellationTokens.Count; i++)
+            {
+                _cancellationTokens[i].Cancel();
+                _cancellationTokens.RemoveAt(i);
+            }
+
             Button button = sender as Button;
            
             //we will assume that it always is a button because... only a button's event uses this
             //so i am not putting a null check since it's a waste of space
             
-            TextBox input = _buttonToInputBox[button]; 
-            input.Tag = false;
+            TextBox input = _buttonToInputBox[button];
             if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
             {
                 //todo: display a message that says the input couldn't be parsed (or something similar...)
@@ -598,14 +607,19 @@ namespace AcctISGenerator
             else //answer is incorrect
             {
                 //and now we play a crappy "animation"
-                input.Tag = true;
                 input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
+                CancellationTokenSource cts = new CancellationTokenSource();
+                _cancellationTokens.Add(cts);
+                CancellationToken ct = cts.Token;
                 while (input.Background.Opacity>0)
                 {
                     Console.Out.WriteLine("in loop");
                     input.Background.Opacity -= .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, ct);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
@@ -615,8 +629,11 @@ namespace AcctISGenerator
                 while (input.Background.Opacity<1.0)
                 {
                     input.Background.Opacity += .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, ct);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
@@ -625,8 +642,11 @@ namespace AcctISGenerator
                 while (input.Background.Opacity>.0)
                 {
                     input.Background.Opacity -= .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, ct);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
@@ -639,6 +659,12 @@ namespace AcctISGenerator
         {
             if (e.Key != Key.Return && e.Key != Key.Enter)
                 return;
+            for (var i = 0; i < _cancellationTokens.Count; i++)
+            {
+                _cancellationTokens[i].Cancel();
+                _cancellationTokens.RemoveAt(i);
+            }
+            
             TextBox input = sender as TextBox;
             if (input is null)
             {
@@ -646,7 +672,7 @@ namespace AcctISGenerator
                 return;
             }
 
-            input.Tag = false;
+            
             if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
             {
                 //todo: display a message that says the input couldn't be parsed (or something similar...)
@@ -665,14 +691,18 @@ namespace AcctISGenerator
             else //answer is incorrect
             {
                 //and now we play a crappy "animation"
-                input.Tag = true;
                 input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
+                CancellationTokenSource cts = new CancellationTokenSource();
+                _cancellationTokens.Add(cts);
                 while (input.Background.Opacity>0)
                 {
                     Console.Out.WriteLine("in loop");
                     input.Background.Opacity -= .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, cts.Token);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
@@ -682,8 +712,11 @@ namespace AcctISGenerator
                 while (input.Background.Opacity<1.0)
                 {
                     input.Background.Opacity += .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, cts.Token);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
@@ -692,8 +725,11 @@ namespace AcctISGenerator
                 while (input.Background.Opacity>.0)
                 {
                     input.Background.Opacity -= .035;
-                    await Task.Delay(25);
-                    if (!(bool)input.Tag)
+                    try
+                    {
+                        await Task.Delay(25, cts.Token);
+                    }
+                    catch (TaskCanceledException taskCanceledException)
                     {
                         input.Background.Opacity = 1.0;
                         return;
