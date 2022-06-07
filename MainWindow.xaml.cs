@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace AcctISGenerator
 {
@@ -87,7 +90,7 @@ namespace AcctISGenerator
             //the stupid operator overloads. this takes up too much space
             //we are not overloading the bitshift operators (there is literally no need for something like this)
             //it was taking up too much space and was a pain to scroll through so i removed some of the line breaks
-                    //this was 90+ lines before...
+            //this was 90+ lines before...
             public static AccountVal operator +(AccountVal a, AccountVal b) { return new AccountVal(a.amount+b.amount); }
             public static AccountVal operator -(AccountVal a, AccountVal b) { return new AccountVal(a.amount-b.amount); }
             public static AccountVal operator /(AccountVal a, AccountVal b) { return new AccountVal(a.amount/b.amount); }
@@ -145,9 +148,44 @@ namespace AcctISGenerator
             _salesDiscounts,_salesRetAndAllow,_transportationIn;
         //15 "accounts" (i am aware that cost of delivered merchandise and coms are not accounts) total
 
+        /* _beginningInventory.Name = "Beginning Inventory";
+            _costOfDeliveredMerchandise.Name = "Cost Of Delivered Merchandise";
+            _costOfMerchandiseSold.Name = "Cost Of Merchandise Sold";
+            _costOfMerchandiseAvaForSale.Name = "Cost Of Merchandise Available For Sale";
+            _endingInventory.Name = "Ending Inventory";
+            _grossProfit.Name = "Gross Profit";
+            _netPurchases.Name = "Net Purchases";
+            _netSales.Name = "Net Sales";
+            _purchases.Name = "Purchases";
+            _purchasesDiscounts.Name = "Purchases Discounts";
+            _purchasesRetAndAllow.Name = "Purchases Returns and Allowances";
+            _sales.Name = "Sales";
+            _salesDiscounts.Name = "Sales Discounts";
+            _salesRetAndAllow.Name = "Sales Returns and Allowances";
+            _transportationIn.Name = "Transportation In";*/
+        
+        //i'd like to have better worded questions beyond "What is amount of x" but, not necessary and I'm on a time crunch
+        /*private static Dictionary<string, string> accountQuestions = new Dictionary<string, string>()
+        {
+            {"Beginning Inventory", ""  }   
+        };*/
+
         private AccountVal[] _accounts;
-        private AccountVal[] _givenAccounts;
-        private int _givenAccountsSize;
+        private List<AccountVal> _givenAccounts;
+        private int _amountSolved;
+        
+        //this is separate so we can use it for the button checking
+        //key will be the associated Button (in relation to the question and what account is being asked for)
+        //...I'm not sure what else to do...
+        private Dictionary<Button, AccountVal> _notGivenAccounts;
+
+        private Dictionary<Button, TextBox> _buttonToInputBox;
+        private Dictionary<TextBox, AccountVal> _inputToNotGiven;
+
+        private static Regex validNumInput = new Regex(@"^(?:-?(?:[.,]\d{3}|\d)*|\((?:[.,]\d{3}|\d)*\))$", RegexOptions.Compiled);
+        
+        //idk what this is for
+        /*private Dictionary<Button, TextBox> _buttonToString;*/
         private void InitializeAccounts()
         {
             /*Randomize:
@@ -176,15 +214,15 @@ namespace AcctISGenerator
             _salesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,14750),false);
 
             _salesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,13440),false);   //haha our company does not provide the discount
-                                                                                                                        //jonathan you are causing me to lose potential business
+            //jonathan you are causing me to lose potential business
 
             //it is bad practice to have a lot of inventory on hand (somethingsomething kaizen... love the fact that they have to use japanese just to say the word improvement)
-                //>>proceeds to give the business a chance for high returns/allowances 
+            //>>proceeds to give the business a chance for high returns/allowances 
             _beginningInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
             
             _endingInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
             
-            _purchases = new AccountVal(RandomNumberGenerator.GetInt32(80000,300000),false/*todo*/);
+            _purchases = new AccountVal(RandomNumberGenerator.GetInt32(80000,300000),false);
            
             _sales = new AccountVal(RandomNumberGenerator.GetInt32(_purchases.amount*3/4,375000),false);
 
@@ -197,7 +235,7 @@ namespace AcctISGenerator
             
             //setting up substitutes
             //by this point if you haven't realized, this stuff is incredibly inefficient (but it works)... i blame UNTs slow-paced CS program
-                                                                                                //also it's been a year or so since i programmed seriously (and in .net)
+            //also it's been a year or so since i programmed seriously (and in .net)
             _purchases.substitutes.Add(new AccountVal[]{_transportationIn,_costOfDeliveredMerchandise});
             
             _transportationIn.substitutes.Add(new AccountVal[]{_purchases,_costOfDeliveredMerchandise});
@@ -296,27 +334,38 @@ namespace AcctISGenerator
                 _purchasesDiscounts, _purchasesRetAndAllow, _sales, _salesDiscounts, _salesRetAndAllow,
                 _transportationIn
             };
-            List<AccountVal> tempArr = _accounts.ToList();
-            //i am not putting a nullcheck since that doesn't make sense
-
-            
-            int tempRandIndex = RandomNumberGenerator.GetInt32(0, tempArr.Count);
-            AccountVal tempRand = tempArr[tempRandIndex];
-            tempRand.needsSolving = true;
-            tempRand.solvingSet = true;
-            tempArr.RemoveAt(tempRandIndex);
-            
-            while (tempArr.Count>0)
+            do
             {
-                int rand = RandomNumberGenerator.GetInt32(0, tempArr.Count);
-                if (!tempArr[rand].solvingSet) //this will result in true for the first iteration 
+                if (_accounts.All(acct => acct.solvingSet)) //for teh loops
                 {
-                    //pass these objects by reference to decrease effect on stack
-                    setSolveStates(tempArr[rand]);
-                    
+                    foreach (var acct in _accounts)
+                    {
+                        acct.solvingSet = false;
+                        acct.needsSolving = false;
+                    }
                 }
-                tempArr.RemoveAt(rand);
-            }
+                List<AccountVal> tempArr = _accounts.ToList();
+                //i definitely did not originally have a null check here... ha ha... ha.........................
+
+                int tempRandIndex = RandomNumberGenerator.GetInt32(0, tempArr.Count);
+                AccountVal tempRand = tempArr[tempRandIndex];
+                tempRand.needsSolving = true;
+                tempRand.solvingSet = true;
+                tempArr.RemoveAt(tempRandIndex);
+
+                while (tempArr.Count > 0)
+                {
+                    int rand = RandomNumberGenerator.GetInt32(0, tempArr.Count);
+                    if (!tempArr[rand].solvingSet) //this will result in true for the first iteration 
+                    {
+                        //pass these objects by reference to decrease effect on stack
+                        setSolveStates(tempArr[rand]);
+
+                    }
+
+                    tempArr.RemoveAt(rand);
+                }
+            } while (_accounts.All(acct => !acct.needsSolving)); //in the event that we do have all account values given we want to redo the thing
         }
 
         //returns true if the account needs to be solved for, false if it does not
@@ -369,77 +418,288 @@ namespace AcctISGenerator
         public MainWindow()
         {
             //i don't know the max unsolved accounts we can have, but I know you need at least 3 accounts to solve most things
-            _givenAccounts = new AccountVal[12]; //i do not think it needs 13, but if it throws an IndexOutOfBounds error then it does
+            _givenAccounts = new List<AccountVal>(14); //the amount of accounts given should never be more than that (hopefully)
+            _notGivenAccounts = new Dictionary<Button, AccountVal>(5); //I do not think it is possible for the program to give more than 5 because of how bad my algorithm is
+            /*_buttonToString = new Dictionary<Button, TextBox>(5); //same as above*/
+            _buttonToInputBox = new Dictionary<Button, TextBox>(5);
+            _inputToNotGiven = new Dictionary<TextBox, AccountVal>(5);
             InitializeComponent();
             StartButton.Click += delegate(object sender, RoutedEventArgs args) {this.StartProgram();};
         }
 
         private void StartProgram()
         {
-            StartGrid.Visibility = Visibility.Hidden;  
-            InitializeAccounts(); 
-            Array.Clear(_givenAccounts);
+            StartGrid.Visibility = Visibility.Hidden;
+            InitializeAccounts();
+            _givenAccounts.Clear();
+            _notGivenAccounts.Clear();
             AccountListGrid.RowDefinitions.Clear();
-            _givenAccountsSize = 0; 
-         
-            //adds all the information to the grid that holds the account information
-            //_accounts is already alphabetically sorted so we shouldn't need to care about resorting this in the grid
-            foreach (AccountVal givenAccount in _accounts.Where(acct => !acct.needsSolving))
-            {
-                _givenAccounts[_givenAccountsSize] = givenAccount;
-                AccountListGrid.RowDefinitions.Add(new RowDefinition());
-                TextBox acctNameTextBox = new TextBox
-                {
-                    Text = givenAccount.Name,
-                    
-                    Margin = new Thickness(1,0,0,1),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    TextAlignment = TextAlignment.Left,
-                    BorderThickness = new Thickness(0),
-                    IsReadOnly = true
-                };
-                Console.Out.WriteLine(acctNameTextBox.Text);
-                Border boarder = new Border()
-                {
-                    BorderBrush = Brushes.Black,
-                    BorderThickness = new Thickness(0,0,1,1)
-                };
-                boarder.Child = acctNameTextBox;
-                AccountListGrid.Children.Add(boarder);
-                Grid.SetRow(boarder,_givenAccountsSize);
-                Grid.SetColumn(boarder,0);
-                TextBox acctValTextBox = new TextBox()
-                {
-                    Text = givenAccount.amount.ToString("N"),
-                    
-                    Margin = new Thickness(0,0,1,1),
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    TextAlignment = TextAlignment.Right,
-                    BorderThickness = new Thickness(0),
-                    IsReadOnly = true
-                };
-                Border acctValBorder = new Border()
-                {
-                    BorderBrush = Brushes.Black,
-                    BorderThickness = new Thickness(0,0,0,1)
-                };
-                acctValBorder.Child = acctValTextBox;
-                AccountListGrid.Children.Add(acctValBorder);
-                Grid.SetRow(acctValBorder,_givenAccountsSize);
-                Grid.SetColumn(acctValBorder,1);
-                _givenAccountsSize++;
-            }
 
-            foreach (UIElement gridChild in AccountListGrid.Children)
+            InitializeAccountList();
+            
+            //this is stupid
+            FunctionGrid.Visibility = AccountListGrid.Visibility = AccountListBorder.Visibility = QuestionGrid.Visibility = Visibility.Visible;
+        }
+        
+       
+
+        //adds all the information to the grid that holds the account information
+        
+        private void InitializeAccountList()
+        {
+            _amountSolved = 0;
+            
+            //_accounts is always alphabetically sorted so we shouldn't need to care about resorting this in the grid
+            foreach (AccountVal acct in _accounts)
+                if (!acct.needsSolving) 
+                    AddToAccountList(acct);
+                else
+                    AddToQuestionList(acct);
+            
+            //since the questions have no border, this does not affect them
+            FixBottomBorderAList();
+            
+            //we add one last row definition to the QuestionGrid to help with the sizes of the other rows
+            QuestionGrid.RowDefinitions.Add(new RowDefinition(){Height = new GridLength(15,GridUnitType.Star)});
+            //personally, 15* looked most appealing to me
+        }
+
+        //adds the account to the Dictionary, _notGivenAccounts, and puts a question on the question grid
+        private void AddToQuestionList(AccountVal acct)
+        {
+            /*_notGivenAccounts.Add(acct);*/
+            /* <TextBox Grid.Row="0" Grid.Column="0" BorderThickness="0" TextWrapping="Wrap" IsReadOnly="True">What is the amount of Inventory on January 1, 2022?</TextBox>
+                        <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="NoWrap"></TextBox>
+                        <Button Grid.Row="0" Grid.Column="2">Submit</Button>*/
+            //Above is the xaml we want to create for each question
+            QuestionGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            int rowIndex = QuestionGrid.RowDefinitions.Count - 1;
+
+            TextBox questionBox = new TextBox()
             {
-                if (gridChild is Border gridChildBorder && Grid.GetRow(gridChild) == AccountListGrid.RowDefinitions.Count - 1)
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                BorderThickness = new Thickness(0), TextWrapping = TextWrapping.Wrap, IsReadOnly = true,
+                Text = $"What is the amount of {acct.Name}?"
+            };
+            /*questionBox.TextChanged += new TextChangedEventHandler();*/
+            TextBox inputBox = new TextBox() { TextWrapping = TextWrapping.NoWrap};
+            inputBox.KeyDown += EnterOrReturnPressed;
+            Button submitButton = new Button() { Content = "Submit" };
+            submitButton.Click += new RoutedEventHandler(SubmitButtonPressed);
+
+            QuestionGrid.Children.Add(questionBox);
+            QuestionGrid.Children.Add(inputBox);
+            QuestionGrid.Children.Add(submitButton);
+            Grid.SetRow(questionBox, rowIndex);
+            Grid.SetRow(inputBox, rowIndex);
+            Grid.SetRow(submitButton, rowIndex);
+            Grid.SetColumn(questionBox, 0);
+            Grid.SetColumn(inputBox, 1);
+            Grid.SetColumn(submitButton, 2);
+
+            _notGivenAccounts.Add(submitButton, acct);
+            _inputToNotGiven.Add(inputBox,acct);
+            _buttonToInputBox.Add(submitButton, inputBox);
+        }
+
+        private void AddToAccountList(AccountVal acct)
+        {
+            _givenAccounts.Add(acct);
+            AccountListGrid.RowDefinitions.Add(new RowDefinition());
+            TextBox acctNameTextBox = new TextBox
+            {
+                Text = acct.Name,
+
+                Margin = new Thickness(1, 0, 0, 1),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                TextAlignment = TextAlignment.Left,
+                BorderThickness = new Thickness(0),
+                IsReadOnly = true
+            };
+            /*Console.Out.WriteLine(acctNameTextBox.Text);*/
+            Border boarder = new Border()
+            {
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(0, 0, 1, 1)
+            };
+            boarder.Child = acctNameTextBox;
+            AccountListGrid.Children.Add(boarder);
+            Grid.SetRow(boarder, _givenAccounts.Count - 1);
+            Grid.SetColumn(boarder, 0);
+            TextBox acctValTextBox = new TextBox()
+            {
+                Text = acct.amount.ToString("N"),
+
+                Margin = new Thickness(0, 0, 1, 1),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                TextAlignment = TextAlignment.Right,
+                BorderThickness = new Thickness(0),
+                IsReadOnly = true
+            };
+            Border acctValBorder = new Border()
+            {
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(0, 0, 0, 1)
+            };
+            acctValBorder.Child = acctValTextBox;
+            AccountListGrid.Children.Add(acctValBorder);
+            Grid.SetRow(acctValBorder, _givenAccounts.Count - 1);
+            Grid.SetColumn(acctValBorder, 1);
+        }
+
+        //setting the border thickness properly for the bottom row. Ideally, these are the last two indices of the list, but we don't know for sure.
+        private void FixBottomBorderAList()
+        {
+            int setCount = 0;
+            for (var index = AccountListGrid.Children.Count - 1;
+                 index >= 0;
+                 index--) //thus we start at the end of the list instead
+            {
+                UIElement gridChild = AccountListGrid.Children[index];
+                if (gridChild is Border gridChildBorder &&
+                    Grid.GetRow(gridChild) == AccountListGrid.RowDefinitions.Count - 1)
                 {
                     gridChildBorder.BorderThickness = new Thickness(0, 0, gridChildBorder.BorderThickness.Right, 0);
+                    if (++setCount == 2) //there are only 2 columns, so we only need to set things twice
+                        break; //so we can simply end the for loop as is
+                } //theoretically that makes this take less than O(N) time.... but idk because I haven't learned much about O-notation
+            }
+        }
+
+        //used to verify answer as a valid input and so the program doesn't constantly create a new cultureinfo (don't want to use CurrentCulture either because idk)
+        private static CultureInfo _cultureInfo = new CultureInfo("en-US");
+         
+        private async void SubmitButtonPressed(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+           
+            //we will assume that it always is a button because... only a button's event uses this
+            //so i am not putting a null check since it's a waste of space
+            
+            TextBox input = _buttonToInputBox[button]; 
+            input.Tag = false;
+            if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
+            {
+                //todo: display a message that says the input couldn't be parsed (or something similar...)
+                return;
+            }
+
+            if (temp == _notGivenAccounts[button].amount)
+            {
+                input.Background = new SolidColorBrush(Color.FromRgb(127,255,0));
+                input.IsReadOnly = true;
+                if (++_amountSolved == _notGivenAccounts.Count) //if the user has successfully solved all questions
+                {
+                    //idk what do? like seriously, i don't know any fancy animations
                 }
             }
-            FunctionGrid.Visibility = AccountListGrid.Visibility = AccountListBorder.Visibility = Visibility.Visible;
+            else //answer is incorrect
+            {
+                //and now we play a crappy "animation"
+                input.Tag = true;
+                input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
+                while (input.Background.Opacity>0)
+                {
+                    Console.Out.WriteLine("in loop");
+                    input.Background.Opacity -= .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+                Console.Out.WriteLine("otu loop");
+                while (input.Background.Opacity<1.0)
+                {
+                    input.Background.Opacity += .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+                while (input.Background.Opacity>.0)
+                {
+                    input.Background.Opacity -= .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private async void EnterOrReturnPressed(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Return && e.Key != Key.Enter)
+                return;
+            TextBox input = sender as TextBox;
+            if (input is null)
+            {
+                await Console.Out.WriteLineAsync("object was not a textbox");
+                return;
+            }
+
+            input.Tag = false;
+            if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
+            {
+                //todo: display a message that says the input couldn't be parsed (or something similar...)
+                return;
+            }
+
+            if (temp == _inputToNotGiven[input].amount)
+            {
+                input.Background = new SolidColorBrush(Color.FromRgb(127,255,0)); //idk why i do this?
+                input.IsReadOnly = true;
+                if (++_amountSolved == _notGivenAccounts.Count) //if the user has successfully solved all questions
+                {
+                    //idk what do? like seriously, i don't know any fancy animations
+                }
+            }
+            else //answer is incorrect
+            {
+                //and now we play a crappy "animation"
+                input.Tag = true;
+                input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
+                while (input.Background.Opacity>0)
+                {
+                    Console.Out.WriteLine("in loop");
+                    input.Background.Opacity -= .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+                Console.Out.WriteLine("otu loop");
+                while (input.Background.Opacity<1.0)
+                {
+                    input.Background.Opacity += .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+                while (input.Background.Opacity>.0)
+                {
+                    input.Background.Opacity -= .035;
+                    await Task.Delay(25);
+                    if (!(bool)input.Tag)
+                    {
+                        input.Background.Opacity = 1.0;
+                        return;
+                    }
+                }
+            }
         }
     }
 }
