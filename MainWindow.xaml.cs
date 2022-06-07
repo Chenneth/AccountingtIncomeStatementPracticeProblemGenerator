@@ -141,7 +141,6 @@ namespace AcctISGenerator
             Sales returns and allowances	3,270
             Transportation in	4,288
         */
-        //Purchases+Transportation in (or Freight in, pick whichever)
         private AccountVal _beginningInventory, _costOfDeliveredMerchandise,_costOfMerchandiseSold,
             _costOfMerchandiseAvaForSale, _endingInventory, _grossProfit,
             _netPurchases,_netSales,_purchases,
@@ -149,23 +148,7 @@ namespace AcctISGenerator
             _salesDiscounts,_salesRetAndAllow,_transportationIn;
         //15 "accounts" (i am aware that cost of delivered merchandise and coms are not accounts) total
 
-        /* _beginningInventory.Name = "Beginning Inventory";
-            _costOfDeliveredMerchandise.Name = "Cost Of Delivered Merchandise";
-            _costOfMerchandiseSold.Name = "Cost Of Merchandise Sold";
-            _costOfMerchandiseAvaForSale.Name = "Cost Of Merchandise Available For Sale";
-            _endingInventory.Name = "Ending Inventory";
-            _grossProfit.Name = "Gross Profit";
-            _netPurchases.Name = "Net Purchases";
-            _netSales.Name = "Net Sales";
-            _purchases.Name = "Purchases";
-            _purchasesDiscounts.Name = "Purchases Discounts";
-            _purchasesRetAndAllow.Name = "Purchases Returns and Allowances";
-            _sales.Name = "Sales";
-            _salesDiscounts.Name = "Sales Discounts";
-            _salesRetAndAllow.Name = "Sales Returns and Allowances";
-            _transportationIn.Name = "Transportation In";*/
-        
-        //i'd like to have better worded questions beyond "What is amount of x" but, not necessary and I'm on a time crunch
+        //i'd like to have better worded questions beyond "What is amount of x" but, not necessary and we'll throw a todo here
         /*private static Dictionary<string, string> accountQuestions = new Dictionary<string, string>()
         {
             {"Beginning Inventory", ""  }   
@@ -178,12 +161,12 @@ namespace AcctISGenerator
         //this is separate so we can use it for the button checking
         //key will be the associated Button (in relation to the question and what account is being asked for)
         //...I'm not sure what else to do...
-        private Dictionary<Button, AccountVal> _notGivenAccounts;
-
         private Dictionary<Button, TextBox> _buttonToInputBox;
-        private Dictionary<TextBox, AccountVal> _inputToNotGiven;
+        private Dictionary<TextBox, AccountVal> _notGivenAccts;
+        private Dictionary<TextBox, TextBox> _inputToWarningBox;
 
-        private static Regex validNumInput = new Regex(@"^(?:-?(?:[.,]\d{3}|\d)*|\((?:[.,]\d{3}|\d)*\))$", RegexOptions.Compiled);
+        //i made a useless regex because i didn't see the tryparse function 
+        //private static Regex validNumInput = new Regex(@"^(?:-?(?:[.,]\d{3}|\d)*|\((?:[.,]\d{3}|\d)*\))$", RegexOptions.Compiled);
         
         //idk what this is for
         /*private Dictionary<Button, TextBox> _buttonToString;*/
@@ -372,17 +355,19 @@ namespace AcctISGenerator
         //returns true if the account needs to be solved for, false if it does not
         private bool setSolveStates(AccountVal a)
         {
+            if (a.solvingSet)
+                return a.IsSolvable();
             a.visiting = true;
             
             //randomize this because otherwise it results in the same accounts being set to needs solving
-            if (RandomNumberGenerator.GetInt32(1,4)==2) //1/3 chance to set the account value as given
+            /*if (RandomNumberGenerator.GetInt32(1,4)==2) //1/3 chance to set the account value as given
             {
                 //this value does not need to be solved for and will be given in the problem
                 a.needsSolving = false;
                 a.solvingSet = true;
                 a.visiting = false;
                 return true;
-            }
+            }*/
             //check if it can be set to unsolved state
             foreach (var substituteArr in a.substitutes)
             {
@@ -395,7 +380,8 @@ namespace AcctISGenerator
                 {
                     AccountVal account = substituteArr[j];
                     //if the value needs to be solved for (this will check recursively, ofcourse)
-                    if (!setSolveStates(account))
+                    //using account.isSolvable() results in only one account being unsolved... so that part of the program may be broken
+                    if (setSolveStates(account))
                     {
                         hasSolution = false;
                         break;
@@ -420,10 +406,13 @@ namespace AcctISGenerator
         {
             //i don't know the max unsolved accounts we can have, but I know you need at least 3 accounts to solve most things
             _givenAccounts = new List<AccountVal>(14); //the amount of accounts given should never be more than that (hopefully)
-            _notGivenAccounts = new Dictionary<Button, AccountVal>(5); //I do not think it is possible for the program to give more than 5 because of how bad my algorithm is
-            /*_buttonToString = new Dictionary<Button, TextBox>(5); //same as above*/
+            /*_buttonToString = new Dictionary<Button, TextBox>(5); I do not think it is possible for the program to give more than 5 because of how bad my algorithm is*/
             _buttonToInputBox = new Dictionary<Button, TextBox>(5);
-            _inputToNotGiven = new Dictionary<TextBox, AccountVal>(5);
+            _notGivenAccts = new Dictionary<TextBox, AccountVal>(5);
+            _inputToWarningBox = new Dictionary<TextBox, TextBox>(5);
+            _cancellationTokens =
+                new Dictionary<TextBox, CancellationTokenSource>(10);
+            _warningCTS = new Dictionary<TextBox, CancellationTokenSource>(10);
             InitializeComponent();
             StartButton.Click += delegate(object sender, RoutedEventArgs args) {this.StartProgram();};
         }
@@ -433,7 +422,8 @@ namespace AcctISGenerator
             StartGrid.Visibility = Visibility.Hidden;
             InitializeAccounts();
             _givenAccounts.Clear();
-            _notGivenAccounts.Clear();
+            _buttonToInputBox.Clear();
+            _notGivenAccts.Clear();
             AccountListGrid.RowDefinitions.Clear();
 
             InitializeAccountList();
@@ -449,7 +439,6 @@ namespace AcctISGenerator
         private void InitializeAccountList()
         {
             _amountSolved = 0;
-            
             //_accounts is always alphabetically sorted so we shouldn't need to care about resorting this in the grid
             foreach (AccountVal acct in _accounts)
                 if (!acct.needsSolving) 
@@ -486,21 +475,40 @@ namespace AcctISGenerator
             TextBox inputBox = new TextBox() { TextWrapping = TextWrapping.NoWrap};
             inputBox.KeyDown += EnterOrReturnPressed;
             Button submitButton = new Button() { Content = "Submit" };
-            submitButton.Click += new RoutedEventHandler(SubmitButtonPressed);
+            submitButton.Click += SubmitButtonPressed;
+            TextBox warningBox = new TextBox()
+            {
+                TextWrapping = TextWrapping.Wrap, BorderThickness = new Thickness(0), FontSize = 10,
+                Foreground = Brushes.Red
+            };
 
+            Grid inputGrid = new Grid(){
+                RowDefinitions =
+                {
+                    new RowDefinition(){Height = new GridLength(3,GridUnitType.Star)},
+                    new RowDefinition(){Height = new GridLength(3,GridUnitType.Star)}
+                },
+                Children = { inputBox, warningBox }
+            };
+            Grid.SetRow(inputBox,0);
+            Grid.SetRow(warningBox,1);
+
+            QuestionGrid.Children.Add(inputGrid);
             QuestionGrid.Children.Add(questionBox);
-            QuestionGrid.Children.Add(inputBox);
+            //QuestionGrid.Children.Add(inputBox);
             QuestionGrid.Children.Add(submitButton);
             Grid.SetRow(questionBox, rowIndex);
-            Grid.SetRow(inputBox, rowIndex);
+            Grid.SetRow(inputGrid,rowIndex);
+            //Grid.SetRow(inputBox, rowIndex);
             Grid.SetRow(submitButton, rowIndex);
             Grid.SetColumn(questionBox, 0);
-            Grid.SetColumn(inputBox, 1);
+            //Grid.SetColumn(inputBox, 1);
+            Grid.SetColumn(inputGrid,1);
             Grid.SetColumn(submitButton, 2);
-
-            _notGivenAccounts.Add(submitButton, acct);
-            _inputToNotGiven.Add(inputBox,acct);
+            
+            _notGivenAccts.Add(inputBox,acct);
             _buttonToInputBox.Add(submitButton, inputBox);
+            _inputToWarningBox.Add(inputBox,warningBox);
         }
 
         private void AddToAccountList(AccountVal acct)
@@ -573,85 +581,34 @@ namespace AcctISGenerator
         private static CultureInfo _cultureInfo = new CultureInfo("en-US");
         
         //todo: convert this to a dictionary of <Textbox,CancellationTokenSource> so we can cancel the animation specific to that question...
-        private List<CancellationTokenSource> _cancellationTokens = new List<CancellationTokenSource>(10);//maybe needs more? could be defined in the constructor
-        
+        //private List<CancellationTokenSource> _cancellationTokens = new List<CancellationTokenSource>(10);//maybe needs more? could be defined in the constructor
+        private Dictionary<TextBox, CancellationTokenSource> _cancellationTokens;
+        private Dictionary<TextBox, CancellationTokenSource> _warningCTS; //is this bad practice
         private async void SubmitButtonPressed(object sender, RoutedEventArgs e)
         {
-            for (var i = 0; i < _cancellationTokens.Count; i++)
-            {
-                _cancellationTokens[i].Cancel();
-                _cancellationTokens.RemoveAt(i);
-            }
-
             Button button = sender as Button;
            
             //we will assume that it always is a button because... only a button's event uses this
             //so i am not putting a null check since it's a waste of space
             
             TextBox input = _buttonToInputBox[button];
-            if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
-            {
-                //todo: display a message that says the input couldn't be parsed (or something similar...)
-                return;
-            }
+            CancelThisTasks(input);
+            await AsyncCheckAnswer(input);
+        }
 
-            if (temp == _notGivenAccounts[button].amount)
+        private void CancelThisTasks(TextBox input)
+        {
+            if (_warningCTS.TryGetValue(input, out var cts))
             {
-                input.Background = new SolidColorBrush(Color.FromRgb(127,255,0));
-                input.IsReadOnly = true;
-                if (++_amountSolved == _notGivenAccounts.Count) //if the user has successfully solved all questions
-                {
-                    //idk what do? like seriously, i don't know any fancy animations
-                }
+                cts.Cancel();
+                _warningCTS.Remove(input);
             }
-            else //answer is incorrect
+            if (_cancellationTokens.TryGetValue(input, out var prevTokenSource))
             {
-                //and now we play a crappy "animation"
-                input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
-                CancellationTokenSource cts = new CancellationTokenSource();
-                _cancellationTokens.Add(cts);
-                CancellationToken ct = cts.Token;
-                while (input.Background.Opacity>0)
-                {
-                    Console.Out.WriteLine("in loop");
-                    input.Background.Opacity -= .035;
-                    try
-                    {
-                        await Task.Delay(25, ct);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
-                }
-                Console.Out.WriteLine("otu loop");
-                while (input.Background.Opacity<1.0)
-                {
-                    input.Background.Opacity += .035;
-                    try
-                    {
-                        await Task.Delay(25, ct);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
-                }
-                while (input.Background.Opacity>.0)
-                {
-                    input.Background.Opacity -= .035;
-                    try
-                    {
-                        await Task.Delay(25, ct);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
-                }
+                prevTokenSource.Cancel();
+                _cancellationTokens.Remove(input);
+                input.Background.Opacity = 1.0;
+                input.Background = Brushes.Transparent;
             }
         }
 
@@ -659,83 +616,92 @@ namespace AcctISGenerator
         {
             if (e.Key != Key.Return && e.Key != Key.Enter)
                 return;
-            for (var i = 0; i < _cancellationTokens.Count; i++)
-            {
-                _cancellationTokens[i].Cancel();
-                _cancellationTokens.RemoveAt(i);
-            }
-            
             TextBox input = sender as TextBox;
-            if (input is null)
-            {
-                await Console.Out.WriteLineAsync("object was not a textbox");
-                return;
-            }
-
-            
+            CancelThisTasks(input);
+            await AsyncCheckAnswer(input);
+        }
+        
+        private async Task AsyncCheckAnswer(TextBox input)
+        {
             if (!Int32.TryParse(input.Text,NumberStyles.Currency, _cultureInfo, out var temp)) //if the value is not in a num format
             {
-                //todo: display a message that says the input couldn't be parsed (or something similar...)
+                CancellationTokenSource cts = new CancellationTokenSource();
+                _warningCTS.Add(input,cts);
+                await AsyncDisplayWarningMessage(_inputToWarningBox[input], cts.Token, "Input is not a number.");
                 return;
             }
-
-            if (temp == _inputToNotGiven[input].amount)
+            if (temp == _notGivenAccts[input]
+                    .amount) //consider removing _notGivenAccounts and using the input dictionary instead
             {
-                input.Background = new SolidColorBrush(Color.FromRgb(127,255,0)); //idk why i do this?
+                input.Background = new SolidColorBrush(Color.FromRgb(127, 255, 0));
                 input.IsReadOnly = true;
-                if (++_amountSolved == _notGivenAccounts.Count) //if the user has successfully solved all questions
+                if (++_amountSolved == _notGivenAccts.Count) //if the user has successfully solved all questions
                 {
                     //idk what do? like seriously, i don't know any fancy animations
                 }
             }
             else //answer is incorrect
             {
-                //and now we play a crappy "animation"
-                input.Background = new SolidColorBrush(Color.FromArgb(255,255,0,0)){Opacity = 1.0};
-                CancellationTokenSource cts = new CancellationTokenSource();
-                _cancellationTokens.Add(cts);
-                while (input.Background.Opacity>0)
+                await AsyncIncorrectAnimation(input);
+            }
+        }
+        
+        //very crappy animation
+        private async Task AsyncIncorrectAnimation(TextBox input)
+        {
+            input.Background = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)) { Opacity = 1.0 };
+            CancellationTokenSource cts = new CancellationTokenSource();
+            _cancellationTokens.Add(input, cts);
+            if (await AsyncDecreaseOpacity(input, cts)) return;
+
+            Console.Out.WriteLine("otu loop");
+            while (input.Background.Opacity < 1.0)
+            {
+                input.Background.Opacity += .035;
+                try
                 {
-                    Console.Out.WriteLine("in loop");
-                    input.Background.Opacity -= .035;
-                    try
-                    {
-                        await Task.Delay(25, cts.Token);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
+                    await Task.Delay(25, cts.Token);
                 }
-                Console.Out.WriteLine("otu loop");
-                while (input.Background.Opacity<1.0)
+                catch (TaskCanceledException taskCanceledException)
                 {
-                    input.Background.Opacity += .035;
-                    try
-                    {
-                        await Task.Delay(25, cts.Token);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
-                }
-                while (input.Background.Opacity>.0)
-                {
-                    input.Background.Opacity -= .035;
-                    try
-                    {
-                        await Task.Delay(25, cts.Token);
-                    }
-                    catch (TaskCanceledException taskCanceledException)
-                    {
-                        input.Background.Opacity = 1.0;
-                        return;
-                    }
+                    return;
                 }
             }
+
+            if(await AsyncDecreaseOpacity(input,cts)) return;
+        }
+
+        private static async Task<bool> AsyncDecreaseOpacity(TextBox input, CancellationTokenSource cts) //consider adding a speed parameter
+        {
+            while (input.Background.Opacity > 0)
+            {
+                input.Background.Opacity -= .035;
+                try
+                {
+                    await Task.Delay(25, cts.Token);
+                }
+                catch (TaskCanceledException taskCanceledException)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task AsyncDisplayWarningMessage(TextBox warningBox, CancellationToken ct, string message="Warning.")
+        {
+            warningBox.Text = message;
+            try
+            {
+                await Task.Delay(5000, ct);
+            }
+            catch (TaskCanceledException e)
+            {
+                return;
+            }
+
+            warningBox.Text = "";
         }
     }
 }
