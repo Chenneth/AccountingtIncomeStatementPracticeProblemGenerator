@@ -32,7 +32,11 @@
                 <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Border x:Name="AccountListBorder" Grid.Column="0" BorderThickness="2" BorderBrush="Black" Margin="5" Visibility="Hidden">
+            
+            <!--This grid is set up in the code, including all row definitions. This is because the amount of rows varies between runs.
+                The default visibility will be Visible until an Income Statement is implemented properly which is a todo
+            -->
+            <Border x:Name="AccountListBorder" Grid.Column="0" BorderThickness="2" BorderBrush="Black" Margin="5" Visibility="Visible">
                 <Grid x:Name="AccountListGrid">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
@@ -546,7 +550,78 @@
                     </Grid>
                 </Border>
             </Grid>
+            
+            <!--Similar to AccountListGrid, this grid is mostly initialized in the code.-->
+            <Grid x:Name="RightHalfGrid" Grid.Column="1" Visibility="Visible">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15*"></RowDefinition>
+                    <RowDefinition Height="2*"></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <Grid x:Name="QuestionGrid" Grid.Row="0" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="7*"></ColumnDefinition>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <!--a 15* blank ending row gives us a decent height for the other rows-->
+                    </Grid.RowDefinitions>
+                    <!--
+                    <Grid Grid.Column="1" Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="3*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" BorderThickness="1">12345679890</TextBox>
+                        <TextBox Grid.Row="1" BorderThickness="0" FontSize="10" Foreground="Red">no</TextBox>
+                    </Grid> -->
+               <!--<TextBox Grid.Row="0" Grid.Column="0" BorderThickness="0" TextWrapping="Wrap" IsReadOnly="True">What is the amount of Inventory on January 1, 2022?</TextBox>
+                   <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="NoWrap"></TextBox>
+                   <Button Grid.Row="0" Grid.Column="2" Content="Test"></Button>-->
+                    
+                </Grid>
+                <Grid x:Name="FunctionButtonsGrid" Grid.Row="1" Visibility="Visible">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="ShowAnswersButton" Margin="3">
+                        <TextBox x:Name="ShowAnswersButtonContent" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin=".5" IsReadOnly="True">Show Answers</TextBox>
+                    </Button>
+                    <Button Grid.Column="0" x:Name="YesButton" Margin="3">
+                        <TextBox TextWrapping="Wrap" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin=".5" IsReadOnly="True">Yes</TextBox>
+                    </Button>
 
+                    
+                    <Button Grid.Column="1" x:Name="FunctionHelpButton" Margin="3" Visibility="Visible">
+                        <TextBox x:Name="FunctionHelpButtonContent" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin=".5" IsReadOnly="True">Help</TextBox>
+                    </Button>
+                    <TextBox Grid.Column="1" x:Name="ConfirmationTextBox" TextWrapping="Wrap" Margin="3" Visibility="Hidden" TextAlignment="Center" BorderThickness="0" Background="Transparent" Foreground="Red" IsReadOnly="True">
+                        Are you sure you want to quit? <!--This is default text, this should be changed when showing the confirmation-->
+                    </TextBox>
+                    
+                    <Button Grid.Column="2" x:Name="BackButton" Margin="3">
+                        <TextBox x:Name="BackButtonContent" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin=".5" IsReadOnly="True">Back to Main Menu</TextBox>
+                    </Button>
+                    <Button Grid.Column="2" x:Name="NoButton" Margin="3">
+                        <TextBox TextWrapping="Wrap" Background="Transparent" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin=".5" IsReadOnly="True">No</TextBox>
+                    </Button>
+                </Grid>
+                <Grid x:Name="RestartQuitGrid" Grid.Row="1" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="RestartButton" Margin="3">
+                        <TextBox x:Name="RestartButtonContent" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Background="Transparent" BorderThickness="0" IsReadOnly="True">Restart</TextBox>
+                    </Button>
+                    <Button Grid.Column="1" x:Name="RestartQuitGridBackButton" Margin="3">
+                        <TextBox x:Name="RestartQuitGridBackButtonContent" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Background="Transparent" BorderThickness="0" IsReadOnly="True">Back to Main Menu</TextBox>
+                    </Button>
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
