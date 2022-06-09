@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.VisualBasic;
 
 namespace AcctISGenerator
 {
@@ -312,7 +313,7 @@ namespace AcctISGenerator
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"{Name}: ${amount.ToString()}";//todo: this needs to use the proper format methods/functions
         }
     }
 
