@@ -44,6 +44,7 @@ namespace AcctISGenerator
             amount = 0;
             SolvingSet = NeedsSolving = false;
             _isSolvableVisiting = Visiting = false;
+            NeedsSolving = true;//debugging
         }
 
         public AccountVal(int amount)
@@ -60,7 +61,8 @@ namespace AcctISGenerator
             Name = "Not set";
             substitutes = new List<AccountVal[]>(3);
             this.amount = amount;
-            SolvingSet = this.NeedsSolving = needsSolving;
+            SolvingSet = false;
+            this.NeedsSolving = needsSolving;
             _isSolvableVisiting = Visiting = false;
         }
 
@@ -69,14 +71,14 @@ namespace AcctISGenerator
         public bool IsSolvableRecursive()
         {
             _isSolvableVisiting = true;
-            if (NeedsSolving)
+            if (!NeedsSolving)
             {
                 _isSolvableVisiting = false;
                 return true;
             }
             //iterate through substitutes
 
-            //mmm it went past the forbidden line in my ide so i split it up a bit
+            /*//mmm it went past the forbidden line in my ide so i split it up a bit
             if ((from substituteGroup in substitutes
                     where !substituteGroup.Any(x => x._isSolvableVisiting)
                     select substituteGroup.All(
@@ -84,8 +86,15 @@ namespace AcctISGenerator
             {
                 _isSolvableVisiting = false;
                 return true;
+            }*/
+            if (substitutes.Any(substituteGroup => substituteGroup.Where(substitute => !substitute._isSolvableVisiting)
+                    .All(substitute => substitute.IsSolvableRecursive())))
+            {
+                _isSolvableVisiting = false;
+                return true;
             }
-
+            
+            
             _isSolvableVisiting = false;
             return false;
         }
@@ -93,22 +102,28 @@ namespace AcctISGenerator
         /*Only returns an expected value is SolvingSet is true*/
         public bool IsSolvable()
         {
-            return (this.NeedsSolving && this.SolvingSet) ||
-                   substitutes.Any(subGroup => subGroup.All(acct => acct.NeedsSolving && acct.SolvingSet));
+            //either it doesn't need solving and the value has been set, or there is a substitute group where all values do not need to be solved for and the value has been properly set
+            return (!this.NeedsSolving && this.SolvingSet) ||
+                   substitutes.Any(subGroup => subGroup.All(acct => (!acct.NeedsSolving && acct.SolvingSet)||acct.UsableSubstitute()));
         }
 
         public bool UsableSubstitute() //Essentially IsSolvableRecursive, but it doesn't check itself for anything
         {
             _isSolvableVisiting = true;
-            if ((from substituteGroup in substitutes
-                    where !substituteGroup.Any(x => x._isSolvableVisiting)
-                    select substituteGroup.All(
+            /*if ((from substituteGroup in substitutes
+                    where substituteGroup.Any(x => !x._isSolvableVisiting) //where none of them are currently being checked in the recursive functions
+                    select substituteGroup.All(//select the groups where the substitute is not null and it is solvable recursively 
                         t => t is not null && t.IsSolvableRecursive())).Any(groupSolvable => groupSolvable))
             {
                 _isSolvableVisiting = false;
                 return true;
-            }
-
+            }*/
+            
+            if(substitutes.Any(//select the substitute groups that
+                   substituteGroup => substituteGroup.Where(//do not have a variable that is currently being visited by the recursive function calls
+                       substitute=>!substitute._isSolvableVisiting).All(//and then check if that group is solvable recursively
+                       substitute =>substitute.IsSolvableRecursive())
+               ))
             _isSolvableVisiting = false;
             return false;
         }
@@ -281,6 +296,24 @@ namespace AcctISGenerator
         {
             return b < a.amount;
         }
+
+        public override bool Equals(object o)
+        {
+            AccountVal test = o as AccountVal;
+            if (test is null)
+                return false;
+            return test.amount == amount && test.Name == Name;//not sure if i want this to also check the substitutes...
+        }
+
+        public override int GetHashCode()
+        {
+            return (amount + Name.GetHashCode())*7;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 
     public class QuestionFinishedEventArgs
@@ -345,6 +378,8 @@ namespace AcctISGenerator
         private AccountVal[] _accounts;
         private List<AccountVal> _givenAccounts;
         private int _amountSolved;
+
+        private HelpWindow _helpWindow;
         
         //this is separate so we can use it for the button checking
         //key will be the associated Button (in relation to the question and what account is being asked for)
@@ -363,6 +398,7 @@ namespace AcctISGenerator
         /*private Dictionary<Button, TextBox> _buttonToString;*/
         private void InitializeAccounts()
         {
+            bool iniNeedsSolving = true;
             /*Randomize:
                 Purchases
                 Transportation In
@@ -380,31 +416,31 @@ namespace AcctISGenerator
 
             //endpoints are arbitrary... don't think too much about them
             //trying to make this seem like a medium-sized business (aka not Walmart)
-            _transportationIn = new AccountVal(500+RandomNumberGenerator.GetInt32(500,10000), false);
+            _transportationIn = new AccountVal(500+RandomNumberGenerator.GetInt32(500,10000), iniNeedsSolving);
 
-            _purchasesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,8700),false);
+            _purchasesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,8700),iniNeedsSolving);
 
-            _purchasesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,16500),false);
+            _purchasesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,16500),iniNeedsSolving);
 
-            _salesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,14750),false);
+            _salesRetAndAllow = new AccountVal(RandomNumberGenerator.GetInt32(300,14750),iniNeedsSolving);
 
-            _salesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,13440),false);   //haha our company does not provide the discount
+            _salesDiscounts = new AccountVal(RandomNumberGenerator.GetInt32(300,13440),iniNeedsSolving);   //haha our company does not provide the discount
             //jonathan you are causing me to lose potential business
 
             //it is bad practice to have a lot of inventory on hand (somethingsomething kaizen... love the fact that they have to use japanese just to say the word improvement)
             //>>proceeds to give the business a chance for high returns/allowances 
-            _beginningInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
+            _beginningInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),iniNeedsSolving);
             
-            _endingInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),false);
+            _endingInventory = new AccountVal(RandomNumberGenerator.GetInt32(10000,30000),iniNeedsSolving);
             
-            _purchases = new AccountVal(RandomNumberGenerator.GetInt32(80000,300000),false);
+            _purchases = new AccountVal(RandomNumberGenerator.GetInt32(80000,300000),iniNeedsSolving);
            
-            _sales = new AccountVal(RandomNumberGenerator.GetInt32(_purchases.amount*3/4,375000),false);
+            _sales = new AccountVal(RandomNumberGenerator.GetInt32(_purchases.amount*3/4,375000),iniNeedsSolving);
 
             _costOfDeliveredMerchandise = _purchases + _transportationIn;
             _netPurchases = _costOfDeliveredMerchandise - _purchasesRetAndAllow - _purchasesDiscounts;
             _netSales = _sales - _salesDiscounts - _salesRetAndAllow;
-            _costOfMerchandiseAvaForSale = _beginningInventory + _purchases;
+            _costOfMerchandiseAvaForSale = _beginningInventory + _netPurchases;
             _costOfMerchandiseSold = _costOfMerchandiseAvaForSale - _endingInventory;
             _grossProfit = _netSales - _costOfMerchandiseSold;
             
@@ -534,8 +570,8 @@ namespace AcctISGenerator
                     if (!tempArr[rand].SolvingSet) //this will result in true for the first iteration 
                     {
                         //pass these objects by reference to decrease effect on stack
-                        setSolveStates(tempArr[rand]);
-
+                        //setSolveStates(tempArr[rand]);
+                        setSolveStatesAlternative(tempArr[rand]);
                     }
 
                     tempArr.RemoveAt(rand);
@@ -564,15 +600,14 @@ namespace AcctISGenerator
             {
                 //check to prevent infinite recursions
                 if (substituteArr.Any(accountVal => accountVal.Visiting))
-                    break;
+                    continue; //changed from a break statement, may [ironically] break the algorithm
                     
-                bool hasSolution = true; //
+                bool hasSolution = true; //we assume that there is a solution
                 for (var j = 0; j < substituteArr.Length; j++)
                 {
                     AccountVal account = substituteArr[j];
-                    //if the value needs to be solved for (this will check recursively, ofcourse)
-                    //using account.isSolvable() results in only one account being unsolved... so that part of the program may be broken
-                    if (setSolveStates(account))
+                    //if the value needs to be solved for
+                    if (!account.IsSolvable())
                     {
                         hasSolution = false;
                         break;
@@ -584,6 +619,40 @@ namespace AcctISGenerator
                 a.SolvingSet = true;
                 a.Visiting = false;
                 return false;
+            }
+            
+            //reaching this point means the program could not find a suitable substitute with the given substitutes
+            a.NeedsSolving = false;
+            a.SolvingSet = true;
+            a.Visiting = false;
+            return true;
+        }
+        
+        //this version assumes all states are already set?
+        private bool setSolveStatesAlternative(AccountVal a)
+        {
+            if (a.SolvingSet)
+                return !a.NeedsSolving;
+            a.Visiting = true;
+            
+            //check if it can be set to unsolved state
+            foreach (var substituteArr in a.substitutes)
+            {
+                /*//check to prevent infinite recursions... may not be needed with alternative method?
+                if (substituteArr.Any(accountVal => accountVal.Visiting))
+                    continue;
+                    */
+
+                bool hasSolution = substituteArr.All(substitute => substitute.IsSolvable());
+                
+                //if this substitute group could not be used to solve for this
+                if (hasSolution)
+                {
+                    a.NeedsSolving = true;
+                    a.SolvingSet = true;
+                    a.Visiting = false;
+                    return false;
+                }
             }
             
             //reaching this point means the program could not find a suitable substitute with the given substitutes
@@ -606,7 +675,10 @@ namespace AcctISGenerator
             _warningCTS = new Dictionary<TextBox, CancellationTokenSource>(10);
             _inputTextBoxes = new List<TextBox>(5);
             InitializeComponent();
+            
             StartButton.Click += delegate {this.StartProgram();};
+            ExitButton.Click += delegate { Application.Current.Shutdown(); }; //might consider adding a confirmation here idk
+            
             ShowAnswersButton.Click += ShowAnswersButtonPressed;
             HelpButton.Click += HelpButtonPressed;
             FunctionHelpButton.Click += HelpButtonPressed;
@@ -628,10 +700,13 @@ namespace AcctISGenerator
             _givenAccounts.Clear();
             _buttonToInputBox.Clear();
             _notGivenAccts.Clear();
+            _inputTextBoxes.Clear();
+            
             AccountListGrid.RowDefinitions.Clear();
             AccountListGrid.Children.Clear();
             
             QuestionGrid.Children.Clear();
+            QuestionGrid.RowDefinitions.Clear();
             
             _showAnswerFlag = _restartFlag = _backToMainFlag = _questionsCompleteFlag = false;
             
@@ -639,7 +714,8 @@ namespace AcctISGenerator
             InitializeAccountList();
             
             //stuff
-            FunctionGrid.Visibility = AccountListGrid.Visibility = AccountListBorder.Visibility = QuestionGrid.Visibility = Visibility.Visible;
+            FunctionButtonsGrid.Visibility = FunctionGrid.Visibility = AccountListGrid.Visibility = AccountListBorder.Visibility = QuestionGrid.Visibility = Visibility.Visible;
+            ShowFunctionButtons();
             HideConfirmationButtons();
         }
 
@@ -697,14 +773,22 @@ namespace AcctISGenerator
                 Text = $"What is the amount of {acct.Name}?"
             };
             /*questionBox.TextChanged += new TextChangedEventHandler();*/
-            TextBox inputBox = new TextBox() { TextWrapping = TextWrapping.NoWrap, Margin = new Thickness(1,0,1,0)};
+            TextBox inputBox = new TextBox() { TextWrapping = TextWrapping.NoWrap, Margin = new Thickness(1,0,1,0),CaretBrush = Brushes.Black};//not sure why, but the caret is set to an aqua for some reason
             inputBox.KeyDown += EnterOrReturnPressed;
-            Button submitButton = new Button() { Content = new TextBox(){Background = Brushes.Transparent, BorderThickness = new Thickness(0),TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center, IsReadOnly = true, Text = "Submit"} };
+            Button submitButton = new Button()
+            {
+                Content = new TextBox()
+                {
+                    Background = Brushes.Transparent, BorderThickness = new Thickness(0),
+                    TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center, IsHitTestVisible = false,
+                    IsReadOnly = true, Text = "Submit"
+                }
+            };
             submitButton.Click += SubmitButtonPressed;
-            TextBox warningBox = new TextBox()
+            TextBox warningBox = new TextBox() //maybe consider adding a tooltip?
             {
                 TextWrapping = TextWrapping.Wrap, BorderThickness = new Thickness(0), FontSize = 10,
-                Foreground = Brushes.Red
+                Foreground = Brushes.Red, IsReadOnly = true
             };
 
             Grid inputGrid = new Grid(){
@@ -891,7 +975,7 @@ namespace AcctISGenerator
                 {
                     await Task.Delay(25, cts.Token);
                 }
-                catch (TaskCanceledException taskCanceledException)
+                catch (TaskCanceledException)
                 {
                     return;
                 }
@@ -909,7 +993,7 @@ namespace AcctISGenerator
                 {
                     await Task.Delay(25, cts.Token);
                 }
-                catch (TaskCanceledException taskCanceledException)
+                catch (TaskCanceledException)
                 {
                     return true;
                 }
@@ -925,7 +1009,7 @@ namespace AcctISGenerator
             {
                 await Task.Delay(5000, ct);
             }
-            catch (TaskCanceledException e)
+            catch (TaskCanceledException)
             {
                 return;
             }
@@ -949,13 +1033,14 @@ namespace AcctISGenerator
 
         private void HelpButtonPressed(object sender, RoutedEventArgs e)
         {
-            //todo: this should display a new window (oh boy this should be fun making another xaml window from scratch
+            _helpWindow = new HelpWindow();
+            _helpWindow.Show();
         }
 
         private void QuitButtonPressed(object sender, RoutedEventArgs e)
         {
             ShowConfirmationButtons();
-            ConfirmationTextBox.Text = "Are you sure you want to show the return to the main menu? Questions and answers will not be saved.";
+            ConfirmationTextBox.Text = "Are you sure you want to return to the main menu? Questions and answers will not be saved.";
             _backToMainFlag = true;
         }
 
@@ -995,9 +1080,16 @@ namespace AcctISGenerator
             {
                 foreach (TextBox inputTextBox in _inputTextBoxes)
                 {
+                    int expectedAnswer = _notGivenAccts[inputTextBox].amount;
+                    
+                    
                     inputTextBox.IsReadOnly = true;
+                    if (Int32.TryParse(inputTextBox.Text, NumberStyles.Currency, _cultureInfo, out var answer)
+                        && answer==expectedAnswer) 
+                        continue;
                     inputTextBox.Foreground = Brushes.YellowGreen;
-                    inputTextBox.Text = _notGivenAccts[inputTextBox].amount.ToString("C",_cultureInfo);
+                    
+                    inputTextBox.Text = expectedAnswer.ToString("C",_cultureInfo);
                 }
                 AllQuestionsFinished();
                 return;
@@ -1018,18 +1110,13 @@ namespace AcctISGenerator
 
         private void NoConfirmationButtonPressed(object sender, RoutedEventArgs e)
         {
-            
-
             if (_backToMainFlag)
             {
                 _backToMainFlag = false;
                 HideConfirmationButtons();
                 if (_questionsCompleteFlag) RestartQuitGrid.Visibility = Visibility.Visible;
-                else
-                {
-                    ShowFunctionButtons();
-                    Console.Out.WriteLine("test");
-                }
+                else ShowFunctionButtons();
+                return;
             }
 
             if (_restartFlag)
