@@ -7,7 +7,7 @@ Additionally, income statement information is based on a textbook's practice and
 
 # Formulas used
 Since there are various disagreeing sources on what Cost of Transported Goods (Cost of Delivered Merchandise) actually is, this is a list of what *this program* uses.
-* Cost Of Delivered Merchandise = Purchases + TransportationIn;
+* Cost Of Delivered Merchandise = Purchases + Transportation In;
 * Net Purchases = Cost Of DeliveredMerchandise - Purchases Returns And Allowances - Purchases Discounts
 * Net Sales = Sales - Sales Discounts - Sales Returns And Allowances
 * Cost Of Merchandise Available For Sale = Beginning Inventory + Net Purchases
