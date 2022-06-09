@@ -10,7 +10,7 @@ Since there are various disagreeing sources on what Cost of Transported Goods (C
 * Cost Of Delivered Merchandise = Purchases + TransportationIn;
 * Net Purchases = Cost Of DeliveredMerchandise - Purchases Returns And Allowances - Purchases Discounts
 * Net Sales = Sales - Sales Discounts - Sales Returns And Allowances
-* Cost Of Merchandise Available For Sale = Beginning Inventory + Purchases
+* Cost Of Merchandise Available For Sale = Beginning Inventory + Net Purchases
 * Cost Of Merchandise Sold = Cost Of Merchandise Available For Sale - Ending Inventory
 * Gross Profit = Net Sales - Cost Of Merchandise Sold
 
