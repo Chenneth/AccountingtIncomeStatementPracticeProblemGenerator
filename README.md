@@ -3,7 +3,7 @@ This is a Windows Forms application that gives partial information from a GAAP-b
 
 This application is based around the Texas UIL Accounting exams which occasionally give a question group asking for contestants to solve for the remaining accounts given partial account information. 
 
-Additionally, income statement information is based on a textbook's practice and mastery problems.
+Additionally, income statement information is based on a 3-column traditional income statement. This is not to be confused with a horizontal analysis income statement. 
 
 # Formulas used
 Since there are various disagreeing sources on what Cost of Transported Goods (Cost of Delivered Merchandise) actually is, this is a list of what *this program* uses.
@@ -17,31 +17,13 @@ Since there are various disagreeing sources on what Cost of Transported Goods (C
 This is also found in the code.
 
 # How it works
-The main bulk of the algorithm comes from a function `setSolveStates`. `setSolveStates` is a recursive function that uses its return values of a bool. A value of `true` means the variable needs solving under the current context. A value of `false` means the variable does not need to be solved (i.e. the initial problem statement will tell the user the value of the variable).
 
-The steps of the algorithm are as follows:
-1. Check if the *solve state* is already set.
-2. If it is, then the function returns the *solve state*.
-4. If it does not, then it iteratively runs through each *substitute group* for the variable.
-5. Each substitute in the group is set using `setSolveStates` and the return value is checked.
-6. If any of the substitutes in a group returns a `false`, then that *substitute group* is not usable to solve the current variable and the loop moves to the next group.
-7. If there are no usable substitutes, then the current variable is set to a *given state*.
-8. If there is a usable substitute, then the current variable is set to a *needs solving state*.
-
-This can be used for non-accounting problems, but this specific implementation uses it for accounting. Additionally, this algorithm uses a variable specific to the variable object for the account values, a boolean called `visiting`. This prevents an infinite recursive call of `setSolveStates` since a a variable of a *substitute group* will be a potential substitue for those in the group.
-
-There is another implementation which only checks if a variable is solvable under the current context, `IsSolvableRecursive`. This uses a similar algorithm, but does not change any values. This uses a separate boolean called `_isSolvableVisiting` which is necessary for the same reasons as above. This method is used in the event that `NeedsSolving` and `SolvingSet` are not used. This was condensed into a LINQ expression, but the main algorithm remains the same:
-1. Check if this variable is in a *given state*
-2. If it is, return `true`
-3. If it is not, then check each *substitute group*.
-4. Check each substitue in the group using `IsSolvable`.
-5. If one of them returns `false`, then check the next group.
-6. If the entire group has viable substitutes, then the method returns `true`.
-7. Otherwise if it checks all substitutes without any working, then the method returns `false`.
-
-Alternatively, there is the normal `IsSolvable` which uses a LINQ expression to check if there exists a viable substitute.
-
-There is also a method which checks whether the variable has a usable substitute, `UsableSubstitute`. It is identical to `IsSolvableRecursive` except it does not check its own *solve state*.
+1. The initialization of the variables starts in the `InitializeAccounts` method, which generates random values for each variable.
+2.  The program then moves on to initializing the *solve state* of each account in random order. This is done using the `SetSolveStatesAlternative` method. 
+3.  `SetSolveStates` checks the list of substitutes to see if the variable can be set to a *needs solving state* by using the `IsSolvable` method for the `AccountVal` object.
+4.  `IsSolvable` returns true if the variable has already been set to a *given state* or if the variable has a usable substitute using `UsableSubstitute`.
+5.  `UsableSubstitute` checks if the variable's substitutes are solvable using `IsSolvableRecursive`, which does the same thing as `UsableSubstitute` but it checks whether the current variable is already in a *given state*.
+6.  Thus, the program returns to `SetSolveStates` using the return value of `IsSolvable`, and if the variable "is solvable" then the method sets the variable to a *needs solving state*.
 
 ## Terminology
 **Given state** - The value of the variable will be given in the generated question set. A *solve state*.
