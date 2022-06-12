@@ -70,8 +70,6 @@
                 <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            
-            <!--This grid is set up in the code, including all row definitions. This is because the amount of rows varies between runs.-->
             <Border x:Name="AccountListBorder" Grid.Column="0" BorderThickness="2" BorderBrush="Black" Margin="5" Visibility="Hidden">
                 <Grid x:Name="AccountListGrid">
                     <Grid.ColumnDefinitions>
@@ -546,19 +544,6 @@
                         <ColumnDefinition Width="5*"></ColumnDefinition>
                         <ColumnDefinition Width="2*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <!--
-                    <Grid Grid.Column="1" Grid.Row="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="3*"></RowDefinition>
-                            <RowDefinition Height="1*"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" BorderThickness="1">12345679890</TextBox>
-                        <TextBox Grid.Row="1" BorderThickness="0" FontSize="10" Foreground="Red">no</TextBox>
-                    </Grid> -->
-               <!--<TextBox Grid.Row="0" Grid.Column="0" BorderThickness="0" TextWrapping="Wrap" IsReadOnly="True">What is the amount of Inventory on January 1, 2022?</TextBox>
-                   <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="NoWrap"></TextBox>
-                   <Button Grid.Row="0" Grid.Column="2" Content="Test"></Button>-->
-                    
                 </Grid>
                 
                 <TextBox x:Name="AllCorrectAnswersTextBox" Grid.Row="1" TextAlignment="Center" 
@@ -603,7 +588,7 @@
                     <TextBox Grid.Column="1" x:Name="ConfirmationTextBox" TextWrapping="Wrap" Margin="3" 
                              Visibility="Hidden" TextAlignment="Center" BorderThickness="0" Background="Transparent"
                              Foreground="Red" IsHitTestVisible="False" IsReadOnly="True">
-                        Are you sure you want to quit? <!--This is default text, this should be changed when showing the confirmation-->
+                        Are you sure you want to quit?
                     </TextBox>
                     
                     <Button Grid.Column="2" x:Name="BackButton" Margin="3">
