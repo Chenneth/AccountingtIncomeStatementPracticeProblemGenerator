@@ -635,8 +635,11 @@ namespace AcctISGenerator
             _fiscalYearEnd = _fiscalYearStart.AddYears(1).AddDays(-1);
             CompanyNameISTextBox.Text = GetRandomCompanyName();
             DateTextISBox.Text = $"For the Year Ended {_fiscalYearEnd:MMMM dd, yyyy}";
-            BeginInventoryISNameTextBox.Text = $"Inventory on {_fiscalYearStart:d}";
-            EndingInventoryISNameTextBox.Text = $"Inventory on {_fiscalYearEnd:d}";
+            _beginningInventory.Name = $"Inventory on {_fiscalYearStart:d}";
+            _endingInventory.Name = $"Inventory on {_fiscalYearEnd:d}";
+            BeginInventoryISNameTextBox.Text = $"\t{_beginningInventory.Name}";
+            EndingInventoryISNameTextBox.Text = $"\t{_endingInventory.Name}";
+            
             
             //first add the accounts to the dictionary correlating themselves to the income statement
             _incomeStatementValueTextBoxes.Add(_beginningInventory, BeginInventoryISValueTextBox);
@@ -688,7 +691,8 @@ namespace AcctISGenerator
             };
             TextBox inputBox = new TextBox
             {
-                TextWrapping = TextWrapping.NoWrap, Margin = new Thickness(1, 0, 1, 0), CaretBrush = Brushes.Black
+                TextWrapping = TextWrapping.NoWrap, Margin = new Thickness(1, 0, 1, 0), CaretBrush = Brushes.Black,
+                MinWidth = 125
             };
             inputBox.KeyDown += EnterOrReturnPressed;
             Button submitButton = new Button
@@ -778,7 +782,9 @@ namespace AcctISGenerator
 
         private void AddToIncomeStatement(AccountVal acct)
         {
-            _incomeStatementValueTextBoxes[acct].Text = acct.Amount.ToString("C0");
+            TextBox incomeStatementValueTextBox = _incomeStatementValueTextBoxes[acct];
+            incomeStatementValueTextBox.Text = acct.Amount.ToString("C0");
+            /*incomeStatementValueTextBox.VerticalAlignment = VerticalAlignment.Bottom;*/
             _givenAccounts.Add(acct);
         }
 
