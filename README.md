@@ -1,3 +1,9 @@
+# Current bugs
+
+**Code in the repository is incomplete. Missing HelpWindow.xaml and .cs**
+
+Income Statement view does not clear old values in the Income Statement.
+
 # What is this?
 This is a Windows Forms application that gives partial information from a GAAP-based income statement and asks the user to solve for other related accounts. Information is currently only displayed in a list, but an income statement version may come soon.
 
@@ -28,16 +34,27 @@ Since there are various disagreeing sources on what Cost of Transported Goods (C
 Based on the 2018-District UIL Accounting test, the following is an example of the accounts you would be required to solve for:
 
 Cost of delivered merchandise             64,295
+
 Cost of merchandise available for sale	  81,112
+
 Gross profit	                            40,488
+
 Net purchases	                            58,612
+
 Net sales	                                96,400
+
 Purchases	                                  ?
+
 Purchases discounts	                        ?
+
 Purchases returns and allowances	         3,487
+
 Sales	                                   101,810
+
 Sales discounts	                            ?
+
 Sales returns and allowances	             3,270
+
 Transportation in	                         4,288
 
 ## Terminology
