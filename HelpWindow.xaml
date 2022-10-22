@@ -1,0 +1,62 @@
+﻿<Window x:Class="AcctISGenerator.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="HelpWindow" Height="450" Width="450">
+    <Grid x:Name="MainGrid">
+       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"> <TextBlock TextWrapping="Wrap" TextAlignment="Left" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" >
+            <Bold FontSize="30" TextDecorations="Underline">About This Program</Bold>
+            <LineBreak/>This program was made to help practice knowledge on some formulas for the income statement.
+            The focus is mainly the portions of the income statement that come above Gross Profit.
+            <LineBreak/><LineBreak/>In particular, this is based on a&#160;<Italic>merchandising business'</Italic>&#160;income statement.
+            This means that there will be a Cost of Goods Sold calculation rather than what is seen in manufacturing and service businesses' 
+            income statements.
+            <LineBreak/><LineBreak/>Source code can be found on the&#160;
+            <Hyperlink NavigateUri="https://github.com/Chenneth/AccountingtIncomeStatementPracticeProblemGenerator" 
+                       RequestNavigate="Hyperlink_OnRequestNavigate">
+                Github
+            </Hyperlink>.<LineBreak/><LineBreak/><Bold FontSize="30" TextDecorations="Underline">How To Use</Bold>
+            <LineBreak/>Pressing the&#160;<Italic>Start Button</Italic>&#160;on the main menu will set up the questions.
+            
+            <LineBreak/><LineBreak/>The left half of the window will have the account information needed to solve the questions
+            on the right half. To answer a question, type in the given submission box and then press
+            &#160;<Italic>Enter</Italic>&#160;or press the&#160;<Italic>Submit Button</Italic>&#160;
+            to the right of the submission box.
+            
+            <LineBreak/><LineBreak/>Valid submissions are numbers only. Negative numbers can be entered either with a '-' sign, or parentheses.
+            If a non-number is entered, a message will appear saying "Input is not a number." below the according submission box.
+            Commas are not needed to separate numbers, but periods are not accepted. No answer will be a decimal.
+            
+            <LineBreak/><LineBreak/>If the answer is incorrect, the submission box will flash red. There are no limits on attempts.
+            
+            <LineBreak/><LineBreak/>Additionally, there are three buttons besides the Submit Buttons: Show Answers, Help, and Back to Main Menu.
+            
+            <LineBreak/><LineBreak/>The&#160;<Italic>Show Answers Button</Italic>&#160;will place all the correct answers in green in the submission box
+             for each question that did not already have a correct answer submitted.
+            
+            <LineBreak/><LineBreak/>The&#160;<Italic>Help Button</Italic>&#160; displays this window.
+            
+            <LineBreak/><LineBreak/>The&#160;<Italic>Back to Main Menu Button</Italic>&#160;returns the program to the initial screen which displayed a Start, Help, and Exit button.
+            
+            <LineBreak/><LineBreak/>Both the&#160;<Italic>Show Answers Button</Italic>&#160;and&#160;<Italic>Back to Main Menu Button</Italic>&#160;
+            ask for confirmation before continuing.
+            
+            <LineBreak/><LineBreak/><Bold FontSize="30" TextDecorations="Underline">Formulas</Bold>
+            <LineBreak/>The following are the formulas used to calculate various values.
+            
+            <LineBreak/><LineBreak/>Cost Of Delivered Merchandise = Purchases + Transportation In
+            
+            <LineBreak/><LineBreak/>Net Purchases = Cost Of DeliveredMerchandise - Purchases Returns And Allowances - Purchases Discounts
+            
+            <LineBreak/><LineBreak/>Net Sales = Sales - Sales Discounts - Sales Returns And Allowances
+            
+            <LineBreak/><LineBreak/>Cost Of Merchandise Available For Sale = Beginning Inventory + Net Purchases
+            
+            <LineBreak/><LineBreak/>Cost Of Merchandise Sold = Cost Of Merchandise Available For Sale - Ending Inventory
+            
+            <LineBreak/><LineBreak/>Gross Profit = Net Sales - Cost Of Merchandise Sold
+       </TextBlock></ScrollViewer>
+    </Grid>
+</Window>
