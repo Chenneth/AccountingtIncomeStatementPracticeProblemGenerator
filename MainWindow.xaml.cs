@@ -370,7 +370,9 @@ namespace AcctISGenerator
         private readonly Dictionary<TextBox, AccountVal> _notGivenAccts;
         private readonly Dictionary<TextBox, TextBox> _inputToWarningBox;
         private readonly List<TextBox> _inputTextBoxes;
-        private readonly Dictionary<AccountVal, TextBox> _incomeStatementValueTextBoxes;
+        private readonly Dictionary<AccountVal, TextBox> _ISAcctToTB;
+        //constant reference means we don't need the resizing capabilities of List
+        private readonly TextBox[] _incomeStatementValueTextBoxes;
         
         private DateTime _fiscalYearStart, _fiscalYearEnd;
         private readonly RandomDateTime _randomDateTime;
@@ -536,9 +538,18 @@ namespace AcctISGenerator
             _cancellationTokens = new Dictionary<TextBox, CancellationTokenSource>(6); 
             _warningCTS = new Dictionary<TextBox, CancellationTokenSource>(6);
             _inputTextBoxes = new List<TextBox>(6);
-            _incomeStatementValueTextBoxes = new Dictionary<AccountVal, TextBox>(15);
+            _ISAcctToTB = new Dictionary<AccountVal, TextBox>(15);
             _randomDateTime = new RandomDateTime();
+            
+            
             InitializeComponent();
+            _incomeStatementValueTextBoxes = new[]
+            {
+                BeginInventoryISValueTextBox, CoDMISValueTextBox, COMSISValueTextBox, COMAFSISValueTextBox,
+                EndingInventoryISValueTextBox, GrossProfitISValueTextBox, NetPurchasesISValueTextBox, NetSalesISValueTextBox,
+                PurchasesISValueTextBox, PurchasesDiscountsISValueTextBox, PurchasesReturnsISValueTextBox, SalesISValueTextBox,
+                SalesDiscountsISValueTextBox, SalesReturnsISValueTextBox, TransportationInISValueTextBox
+            };
             StartButton.Click += delegate {OpenSelectModeMenu();};
             ExitButton.Click += delegate {Application.Current.Shutdown();};
             ShowAnswersButton.Click += ShowAnswersButtonPressed;
@@ -642,21 +653,21 @@ namespace AcctISGenerator
             
             
             //first add the accounts to the dictionary correlating themselves to the income statement
-            _incomeStatementValueTextBoxes.Add(_beginningInventory, BeginInventoryISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_costOfDeliveredMerchandise, CoDMISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_costOfMerchandiseSold, COMSISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_costOfMerchandiseAvaForSale, COMAFSISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_endingInventory, EndingInventoryISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_grossProfit, GrossProfitISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_netPurchases, NetPurchasesISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_netSales, NetSalesISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_purchases, PurchasesISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_purchasesDiscounts, PurchasesDiscountsISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_purchasesRetAndAllow, PurchasesReturnsISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_sales, SalesISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_salesDiscounts, SalesDiscountsISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_salesRetAndAllow, SalesReturnsISValueTextBox);
-            _incomeStatementValueTextBoxes.Add(_transportationIn, TransportationInISValueTextBox);
+            _ISAcctToTB.Add(_beginningInventory, BeginInventoryISValueTextBox);
+            _ISAcctToTB.Add(_costOfDeliveredMerchandise, CoDMISValueTextBox);
+            _ISAcctToTB.Add(_costOfMerchandiseSold, COMSISValueTextBox);
+            _ISAcctToTB.Add(_costOfMerchandiseAvaForSale, COMAFSISValueTextBox);
+            _ISAcctToTB.Add(_endingInventory, EndingInventoryISValueTextBox);
+            _ISAcctToTB.Add(_grossProfit, GrossProfitISValueTextBox);
+            _ISAcctToTB.Add(_netPurchases, NetPurchasesISValueTextBox);
+            _ISAcctToTB.Add(_netSales, NetSalesISValueTextBox);
+            _ISAcctToTB.Add(_purchases, PurchasesISValueTextBox);
+            _ISAcctToTB.Add(_purchasesDiscounts, PurchasesDiscountsISValueTextBox);
+            _ISAcctToTB.Add(_purchasesRetAndAllow, PurchasesReturnsISValueTextBox);
+            _ISAcctToTB.Add(_sales, SalesISValueTextBox);
+            _ISAcctToTB.Add(_salesDiscounts, SalesDiscountsISValueTextBox);
+            _ISAcctToTB.Add(_salesRetAndAllow, SalesReturnsISValueTextBox);
+            _ISAcctToTB.Add(_transportationIn, TransportationInISValueTextBox);
 
             //set the font color since it sometimes changes
             BeginInventoryISValueTextBox.Foreground = CoDMISValueTextBox.Foreground = COMSISValueTextBox.Foreground =
@@ -782,7 +793,7 @@ namespace AcctISGenerator
 
         private void AddToIncomeStatement(AccountVal acct)
         {
-            TextBox incomeStatementValueTextBox = _incomeStatementValueTextBoxes[acct];
+            TextBox incomeStatementValueTextBox = _ISAcctToTB[acct];
             incomeStatementValueTextBox.Text = acct.Amount.ToString("C0");
             /*incomeStatementValueTextBox.VerticalAlignment = VerticalAlignment.Bottom;*/
             _givenAccounts.Add(acct);
@@ -898,7 +909,7 @@ namespace AcctISGenerator
                 input.Background = new SolidColorBrush(Color.FromRgb(127, 255, 0));
                 input.IsReadOnly = true;
                 if (_isIncomeStatementProblem)
-                    PutAnswerIncomeStatement(_incomeStatementValueTextBoxes[notGivenAcct], givenAnswer, Brushes.YellowGreen);
+                    PutAnswerIncomeStatement(_ISAcctToTB[notGivenAcct], givenAnswer, Brushes.YellowGreen);
                 if (++_amountSolved == _notGivenAccts.Count)
                     AllQuestionsFinished();
             }
@@ -941,7 +952,7 @@ namespace AcctISGenerator
             ConfirmationTextBox.Text = "Are you sure you want to restart?";
             _restartFlag = true;
         }
-
+        
         private void YesConfirmationButtonPressed(object sender, RoutedEventArgs e)
         {
             if (_backToMainFlag)
@@ -959,7 +970,7 @@ namespace AcctISGenerator
                 OpenSelectModeMenu();
                 return;
             }
-
+            
             if (_showAnswerFlag)
             {
                 if (_isIncomeStatementProblem)
@@ -978,7 +989,7 @@ namespace AcctISGenerator
 
                         inputTextBox.Text = expectedAnswer.ToString("C", CultureInfo);
 
-                        PutAnswerIncomeStatement(_incomeStatementValueTextBoxes[notGivenAcct], expectedAnswer,
+                        PutAnswerIncomeStatement(_ISAcctToTB[notGivenAcct], expectedAnswer,
                             Brushes.DarkOrange);
                     }
                 }
@@ -1010,6 +1021,15 @@ namespace AcctISGenerator
                 inputTextBox.IsReadOnly = false;
                 inputTextBox.Foreground = Brushes.Black;
                 inputTextBox.Text = "";
+            }
+
+            if (_isIncomeStatementProblem)
+            {
+                foreach (TextBox textBox in _incomeStatementValueTextBoxes)
+                {
+                    textBox.Text = "";
+                    textBox.Foreground = Brushes.Black;
+                }
             }
         }
 
