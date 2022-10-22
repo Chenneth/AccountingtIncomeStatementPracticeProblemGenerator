@@ -1,7 +1,3 @@
-# Current bugs
-
-Income Statement view does not clear old values in the Income Statement.
-
 # What is this?
 This is a Windows Forms application that gives partial information from a GAAP-based income statement and asks the user to solve for other related accounts. Information is currently only displayed in a list, but an income statement version may come soon.
 
