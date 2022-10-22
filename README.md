@@ -1,7 +1,5 @@
 # Current bugs
 
-**Code in the repository is incomplete. Missing HelpWindow.xaml and .cs**
-
 Income Statement view does not clear old values in the Income Statement.
 
 # What is this?
